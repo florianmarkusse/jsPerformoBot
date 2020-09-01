@@ -10,6 +10,7 @@ import { solveConditionalExpression } from './conditionalExpression.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 import { variablesMap } from '../types/variable.mjs';
 import { VariableType } from '../types/variable.mjs';
+import { solveMemberExpression } from './memberExpression.mjs';
 
 export function handleVariableDeclarator(initNode) {
     if (initNode != null) {

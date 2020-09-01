@@ -1,5 +1,4 @@
-import { variablesMap } from '../types/variable.mjs';
-import { VariableType } from '../types/variable.mjs';
+import { variablesMap, VariableType } from '../types/variable.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',

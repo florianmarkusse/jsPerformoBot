@@ -1,8 +1,8 @@
 import { NodeType, getValueFromLiteralOrIdentifierNode } from './nodeType.mjs'; 
-import { VariableType, variablesMap} from '../types/variable.mjs';
+import { VariableType, variablesMap } from '../types/variable.mjs';
 
 
-export function solveMemberExpression(memberNode, base) {
+export function solveMemberExpression(memberNode) {
 
     if (memberNode.object.type === NodeType.MemberExpression) {
 
