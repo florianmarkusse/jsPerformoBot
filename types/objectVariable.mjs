@@ -33,7 +33,7 @@ export class ObjectVariable extends Variable {
     }
 
     set(key, value) {
-        this.propertiesMap.set(name, element);
+        this.propertiesMap.set(key, value);
     }
 
 }
