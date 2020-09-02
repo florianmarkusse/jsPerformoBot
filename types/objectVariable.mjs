@@ -1,7 +1,7 @@
 import {Variable, VariableType, variablesMap} from './variable.mjs';
 import { ArrayVariable } from './arrayVariable.mjs';
 import { NodeType } from '../node_types/nodeType.mjs';
-import { handleVariableDeclarator } from '../node_types/variableDeclarator.mjs';
+import { getVariable } from '../node_types/assignmentExpression.mjs';
 
 export class ObjectVariable extends Variable {
 
@@ -24,9 +24,17 @@ export class ObjectVariable extends Variable {
                 key = property.key.value;
             }
 
-            let value = handleVariableDeclarator(property.value);
+            let value = getVariable(property.value);
             this.propertiesMap.set(key, value);
-    }       
+    }
+    
+    get(name)  {
+        return this.propertiesMap.get(name);
+    }
+
+    set(key, value) {
+        this.propertiesMap.set(name, element);
+    }
 
 }
 

@@ -5,6 +5,7 @@
   "description": "bot for javascript performance",
   "main": "app.js",
   "dependencies": {
+    "escodegen": "^2.0.0",
     "espree": "^7.3.0",
     "estree-walker": "^2.0.1",
     "fs": "0.0.1-security",

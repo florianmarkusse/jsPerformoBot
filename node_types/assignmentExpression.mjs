@@ -1,10 +1,20 @@
-import { handleVariableDeclarator } from './variableDeclarator.mjs';
+import { getCopyOrReference } from './variableDeclarator.mjs';
 import { NodeType } from './nodeType.mjs'; 
 import { solveMemberExpression } from './memberExpression.mjs';
 import { VariableType, variablesMap } from '../types/variable.mjs';
+import { ContiguityResult } from '../types/arrayVariable.mjs';
+import { contiguityWarning } from '../warnings/arrayContiguityWarning.mjs';
+
+import { ArrayVariable } from '../types/arrayVariable.mjs';
+import { LiteralVariable } from '../types/literalVariable.mjs';
+import { ObjectVariable } from '../types/objectVariable.mjs';
+import { UnknownVariable } from '../types/unknownVariable.mjs';
+import { solveBinaryExpressionChain } from './binaryExpression.mjs';
+import { solveConditionalExpression } from './conditionalExpression.mjs';
+import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 
 export function handleAssignmentExpression(assignmentNode) {
-    let right = handleVariableDeclarator(assignmentNode.right);
+    let right = getVariable(assignmentNode.right);
                 
     switch (assignmentNode.left.type) {
         case NodeType.Identifier:
@@ -20,32 +30,31 @@ export function handleAssignmentExpression(assignmentNode) {
             break;
         case NodeType.MemberExpression:
             let result = solveMemberExpression(assignmentNode.left);
-            switch (result[0].type) {
-                case VariableType.object: {
+            let variable = result[0].get(result[1]);
 
-                    let variable = result[0].propertiesMap.get(result[1]);
-
-                    if (variable.type === right.type && variable.type === VariableType.literal) {
-                        let operator = assignmentNode.operator.slice(0, -1);
-                        variable.value = eval(String(variable.value) + operator + String(right.value));
-                    } else {
-                        result[0].propertiesMap.set(result[1], right);
-                    }
-                    break;
-                }
-                case VariableType.array: {
-
-                    let variable = result[0].getElement(result[1]);
-
-                    if (variable.type === right.type && variable.type === VariableType.literal) {
-                        let operator = assignmentNode.operator.slice(0, -1);
-                        variable.value = eval(String(variable.value) + operator + String(right.value));
-                    } else {
-                        result[0].setElement(parseInt(result[1]), right);
-                    }
-                    break;
-                }
+            if (variable !== undefined && variable.type === right.type && variable.type === VariableType.literal && assignmentNode.operator !== "=") {
+                let operator = assignmentNode.operator.slice(0, -1);
+                variable.value = eval(String(variable.value) + operator + String(right.value));
+            } else {
+                result[0].set(result[1], right);
             }
             break;
+    }
+    return false;
+}
+
+export function getVariable(rightNode) {
+    console.log(rightNode);
+    switch (rightNode.type) {
+
+        case NodeType.Literal:
+            return new LiteralVariable(rightNode.value);
+        case NodeType.Identifier:
+            return getCopyOrReference(variablesMap.get(rightNode.name));
+        case NodeType.ObjectExpression:
+            return new ObjectVariable(rightNode.properties);
+            // TODO: MEMBEREXPRESSION
+        case NodeType.MemberExpression:
+            let result = solveMemberExpression(rightNode);
     }
 }

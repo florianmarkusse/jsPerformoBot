@@ -1,10 +1,16 @@
 import {Variable, VariableType} from './variable.mjs';
-import { handleVariableDeclarator } from '../node_types/variableDeclarator.mjs';
+import { getVariable } from '../node_types/assignmentExpression.mjs';
 
 export const ArrayState = Object.freeze({
     'unkown': 'unkown', 
     'numeric': 'numeric',
     'nonNumeric': 'nonNumeric',
+})
+
+export const ContiguityResult = Object.freeze({
+    'fine':'fine',
+    'nonNumeric': 'nonNumeric',
+    'nonContiguous':'nonContiguous',
 })
 
 export class ArrayVariable extends Variable {
@@ -22,14 +28,14 @@ export class ArrayVariable extends Variable {
     }
 
     addElement(elementNode) {
-        this.elements[this.elements.length] = handleVariableDeclarator(elementNode);
+        this.elements[this.elements.length] = getVariable(elementNode);
     }
 
-    getElement(index) {
+    get(index) {
         return this.elements[index];
     }
 
-    setElement(index, element) {
+    set(index, element) {
         this.elements[index] = element;
     }
 
@@ -46,12 +52,13 @@ export class ArrayVariable extends Variable {
 
     checkForcontiguity(key) {
         if (!Number.isInteger(key) || key < 0) {
-            console.log("added a value to an array with a non-integer key.")
+            return ContiguityResult.nonNumeric;
         } else {
             if (key > this.elements.length) {
-                console.log("added a value to an array with a key that makes the array non-contiguous")
+                return ContiguityResult.nonContiguous;
             }
         }
+        return ContiguityResult.fine;
     }
 
     checkNumericToNonNumeric(value) {

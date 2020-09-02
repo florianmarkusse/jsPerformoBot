@@ -1,5 +1,6 @@
 import { NodeType, getValueFromLiteralOrIdentifierNode } from './nodeType.mjs'; 
 import { VariableType, variablesMap } from '../types/variable.mjs';
+import { getVariableFromLiteralOrIdentifierNode } from './nodeType.mjs';
 
 
 export function solveMemberExpression(memberNode) {
@@ -17,8 +18,14 @@ export function solveMemberExpression(memberNode) {
         }
 
     } else {
-        let propertyVariable = getValueFromLiteralOrIdentifierNode(memberNode.property);
         let objectVariable = variablesMap.get(memberNode.object.name);
+
+        let propertyVariable;
+        if (objectVariable.type === VariableType.object) {
+            propertyVariable = memberNode.property.name;
+        } else {
+            propertyVariable = getVariableFromLiteralOrIdentifierNode(memberNode.property);
+        }
 
         return [objectVariable, propertyVariable,];
     }

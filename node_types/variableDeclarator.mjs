@@ -12,7 +12,7 @@ import { variablesMap } from '../types/variable.mjs';
 import { VariableType } from '../types/variable.mjs';
 import { solveMemberExpression } from './memberExpression.mjs';
 
-export function handleVariableDeclarator(initNode) {
+export function handleVariableDeclarator(name, initNode) {
     if (initNode != null) {
         switch (initNode.type) {
             case NodeType.MemberExpression: {
@@ -26,49 +26,62 @@ export function handleVariableDeclarator(initNode) {
                         variable = result[0].getElement(parseInt(result[1]));
                         break;
                 }
-                return getCopyOrReference(variable);
+                variablesMap.set(name, getCopyOrReference(variable));
+                return;
             }
             case NodeType.Identifier:
-                return getCopyOrReference(variablesMap.get(initNode.name));
+                variablesMap.set(name, getCopyOrReference(variablesMap.get(initNode.name)));
+                return;
             case NodeType.Literal:
-                return new LiteralVariable(initNode.value);
+                variablesMap.set(name, new LiteralVariable(initNode.value));
+                return;
             case NodeType.ArrayExpression:
-                return new ArrayVariable(initNode.elements);
+                variablesMap.set(name, new ArrayVariable(initNode.elements)); 
+                return;
             case NodeType.ObjectExpression:
-                return new ObjectVariable(initNode.properties);
+                variablesMap.set(name, new ObjectVariable(initNode.properties));
+                return;
             case NodeType.BinaryExpression:
                 let result = solveBinaryExpressionChain(initNode);
                 if (result === undefined) {
-                    return new UnknownVariable();
+                    variablesMap.set(name, new UnknownVariable());
+                    return;
                 } else {
-                    return new LiteralVariable(result);
+                    variablesMap.set(name, new LiteralVariable(result));
+                    return;
                 }
                 
             case NodeType.ConditionalExpression:
                 let newNode = solveConditionalExpression(initNode);
 
                 if (newNode === undefined) {
-                    return new UnknownVariable();
+                    variablesMap.set(name, new UnknownVariable());
+                    return;
                 } else {
                     switch (newNode.type) {
                         case NodeType.Literal:
-                            return new LiteralVariable(newNode.value);
+                            variablesMap.set(name, new LiteralVariable(newNode.value));
+                            return;
                         case NodeType.ArrayExpression:
-                            return new ArrayVariable(newNode.elements);
+                            variablesMap.set(name, new ArrayVariable(newNode.elements));
+                            return;
                         case NodeType.ObjectExpression:
-                            return new ObjectVariable(newNode.properties);
+                            variablesMap.set(name, new ObjectVariable(newNode.properties));
+                            return;
                     }
                 }
                 break;
             default:
-                return new UnknownVariable();
+                variablesMap.set(name, new UnknownVariable());
+                return;
         } 
     } else {
-        return new UndefinedVariable();
+        variablesMap.set(name, new UndefinedVariable());
+        return;
     } 
 }
 
-function getCopyOrReference(variable) {
+export function getCopyOrReference(variable) {
     switch (variable.type) {
         case VariableType.literal:
         case VariableType.undefined:
