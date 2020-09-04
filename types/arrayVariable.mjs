@@ -1,5 +1,5 @@
 import {Variable, VariableType} from './variable.mjs';
-import { getVariable } from '../node_types/assignmentExpression.mjs';
+import { getVariable } from '../node_types/nodeType.mjs';
 
 export const ArrayState = Object.freeze({
     'unkown': 'unkown', 

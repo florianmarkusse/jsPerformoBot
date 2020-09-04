@@ -1,32 +1,51 @@
-import { NodeType, getValueFromLiteralOrIdentifierNode } from './nodeType.mjs'; 
-import { VariableType, variablesMap } from '../types/variable.mjs';
-import { getVariableFromLiteralOrIdentifierNode } from './nodeType.mjs';
+import { NodeType } from './nodeType.mjs'; 
+import { VariableType, getFromVariables } from '../types/variable.mjs';
 
 
 export function solveMemberExpression(memberNode) {
 
     if (memberNode.object.type === NodeType.MemberExpression) {
 
-        let propertyVariable = getValueFromLiteralOrIdentifierNode(memberNode.property);
         let baseVariable = solveMemberExpression(memberNode.object);
+        let propertyVariable = getPropertyVariable(memberNode.property);
         
-        switch (baseVariable[0].type) {
-            case VariableType.object:
-                return [baseVariable[0].propertiesMap.get(baseVariable[1]), propertyVariable];
-            case VariableType.array:
-                return [baseVariable[0].getElement(parseInt(baseVariable[1])), propertyVariable];
-        }
-
+        return [baseVariable[0].get(baseVariable[1]), propertyVariable];
     } else {
-        let objectVariable = variablesMap.get(memberNode.object.name);
+        let objectVariable = getFromVariables(memberNode.object.name);
 
         let propertyVariable;
-        if (objectVariable.type === VariableType.object) {
-            propertyVariable = memberNode.property.name;
-        } else {
-            propertyVariable = getVariableFromLiteralOrIdentifierNode(memberNode.property);
+        switch (objectVariable.type) {
+            case VariableType.object:
+                propertyVariable = getPropertyVariable(memberNode.property);
+                break;
+            case VariableType.array:
+                propertyVariable = getPropertyValue(memberNode.property);
+                break;
         }
+        return [objectVariable, propertyVariable];
+    }
+}
 
-        return [objectVariable, propertyVariable,];
+function getPropertyVariable(propertyNode) {
+    switch (propertyNode.type) {
+        case NodeType.Identifier:
+            return propertyNode.name;
+        case NodeType.Literal:
+            return propertyNode.value;
+    }
+}
+
+function getPropertyValue(propertyNode) {
+
+    switch (propertyNode.type) {
+        case NodeType.Identifier:
+            let variable = getFromVariables(propertyNode.name);
+            if (variable.type === VariableType.unknown) {
+                return;
+            } else {
+                return variable.value;
+            }
+        case NodeType.Literal:
+            return propertyNode.value;
     }
 }

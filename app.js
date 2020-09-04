@@ -4,7 +4,7 @@ import escodegen from 'escodegen';
 
 
 import { processASTNode } from './node_types/nodeType.mjs';
-import { variablesMap } from './types/variable.mjs';
+import { clearVariables, getVariables } from './types/variable.mjs';
 
 fs.readFile('./example.js', function read(err, data) {
     if (err) {
@@ -18,14 +18,14 @@ fs.readFile('./example.js', function read(err, data) {
 function processFile(content) {
     const ast = espree.parse(content, { tokens: false, ecmaVersion: 11 });
 
-    variablesMap.clear();
+    clearVariables();
     processASTNode(ast);
     
     let result = escodegen.generate(ast);
     console.log(result);
 
 
-    variablesMap.forEach(element => {
+    getVariables().forEach(element => {
         console.log(element);
     });
 }

@@ -1,7 +1,5 @@
-import {Variable, VariableType, variablesMap} from './variable.mjs';
-import { ArrayVariable } from './arrayVariable.mjs';
-import { NodeType } from '../node_types/nodeType.mjs';
-import { getVariable } from '../node_types/assignmentExpression.mjs';
+import {Variable, VariableType} from './variable.mjs';
+import { NodeType, getVariable } from '../node_types/nodeType.mjs';
 
 export class ObjectVariable extends Variable {
 
@@ -36,23 +34,4 @@ export class ObjectVariable extends Variable {
         this.propertiesMap.set(key, value);
     }
 
-}
-
-function identifierValue(valueNode) {
-    if (!variablesMap.has(valueNode.name)) {
-        console.error("Variable that is given as value in key-value property for object is not registered!");
-    }
-
-    let variable = variablesMap.get(valueNode.name);
-
-    switch (variable.type) {
-        case VariableType.literal:
-            return variable.value;
-        case VariableType.object:
-        case VariableType.array:
-        case VariableType.unknown:
-            return variable;
-        default:
-            console.error("Variable has no set variable type!");
-    }
 }
