@@ -12,8 +12,7 @@ export function handleAssignmentExpression(assignmentNode) {
             let left = getFromVariables(assignmentNode.left.name);
             
             if (left.type === right.type && left.type === VariableType.literal) {
-                let operator = assignmentNode.operator.slice(0, -1);
-                left.value = eval(String(left.value) + operator + String(right.value));
+                left.value = solveOperator(left.value, assignmentNode.operator, right.value);
             } else {
                 setToVariables(assignmentNode.left.name, right);
             }
@@ -22,14 +21,15 @@ export function handleAssignmentExpression(assignmentNode) {
             let result = solveMemberExpression(assignmentNode.left);
             let variable = result[0].get(result[1]);
 
-            console.log(result);
-
             if (variable !== undefined && variable.type === right.type && variable.type === VariableType.literal && assignmentNode.operator !== "=") {
-                let operator = assignmentNode.operator.slice(0, -1);
-                variable.value = eval(String(variable.value) + operator + String(right.value));
+                variable.value = solveOperator(variable.value, assignmentNode.operator, right.value);
             } else {
                 result[0].set(result[1], right);
             }
             break;
     }
+}
+
+function solveOperator(leftValue, operator, rightValue) {
+    return eval(String(leftValue) + operator.slice(0, -1) + String(rightValue));
 }

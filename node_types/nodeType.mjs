@@ -1,10 +1,11 @@
 import pkg from 'estree-walker'; 
 const {walk} = pkg;
 
-import { getFromVariables, getCopyOrReference, doPostfixOperation } from '../types/variable.mjs';
+import { getFromVariables, getCopyOrReference } from '../types/variable.mjs';
 import { LiteralVariable } from '../types/literalVariable.mjs';
 import { ObjectVariable } from '../types/objectVariable.mjs';
 import { ArrayVariable } from '../types/arrayVariable.mjs';
+import { UnknownVariable } from '../types/unknownVariable.mjs';
 
 import { handleVariableDeclarator} from './variableDeclarator.mjs';
 import { handleAssignmentExpression } from './assignmentExpression.mjs';
@@ -12,6 +13,8 @@ import { handleForStatement } from './forStatement.mjs';
 import { handleUpdateExpression } from './updateExpression.mjs';
 import { solveBinaryExpressionChain } from './binaryExpression.mjs';
 import { solveMemberExpression } from './memberExpression.mjs';
+import { handleWhileStatement } from './whileStatement.mjs';
+import { handleDoWhileStatement } from './doWhileStatement.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
@@ -28,6 +31,10 @@ export const NodeType = Object.freeze({
     'VariableDeclaration':'VariableDeclaration',
     'SequenceExpression':'SequenceExpression',
     'UpdateExpression':'UpdateExpression',
+    'WhileStatement':'WhileStatement',
+    'DoWhileStatement':'DoWhileStatement',
+    'BlockStatement':'BlockStatement',
+    'CallExpression':'CallExpression',
 })
 
 export function getVariable(rightNode) {
@@ -41,19 +48,20 @@ export function getVariable(rightNode) {
         case NodeType.ArrayExpression:
             return new ArrayVariable(rightNode.elements);
         case NodeType.BinaryExpression:
-            return solveBinaryExpressionChain(rightNode);
+            return solveBinaryExpressionChain(rightNode, true);
         case NodeType.MemberExpression:
             let result = solveMemberExpression(rightNode);
             return getCopyOrReference(result[0].get(result[1]));
         case NodeType.ConditionalExpression:
             return solveConditionalExpression(rightNode);
         case NodeType.UpdateExpression:
-            return handleUpdateExpression(rightNode)
+            return getCopyOrReference(handleUpdateExpression(rightNode));
+        case NodeType.CallExpression:
+            return new UnknownVariable();
     }
 }
 
 export function processASTNode(ast) {
-    console.log("in PROCESS AST NODE");
     walk( ast, {
         enter: function ( node, parent, prop, index ) {
 
@@ -80,6 +88,16 @@ export function processASTNode(ast) {
                     handleForStatement(node);
                     this.skip();
                     break;
+                // While statement.
+                case NodeType.WhileStatement:
+                    handleWhileStatement(node);
+                    this.skip();
+                    break;
+                // Do while statement.
+                case NodeType.DoWhileStatement:
+                    handleDoWhileStatement(node);
+                    this.skip();
+                    break;
                 // Sequence of expressions.
                 case NodeType.SequenceExpression:
                     node.expressions.forEach(expression => {
@@ -89,14 +107,24 @@ export function processASTNode(ast) {
                     break;
                 // Variable is updated.
                 case NodeType.UpdateExpression:
-                    let postFixOperator = handleUpdateExpression(node)[1];
-                    if (postFixOperator) {
-                        doPostfixOperation();
-                    }
-                    this.skip();
+                    handleUpdateExpression(node);
+                    this.skip()
+                    break;
+
             }
         },
         leave: function ( node, parent, prop, index ) {
         }
     });
 }
+
+export function processSingleASTNode(node) {
+    switch(node.type) {
+        // Binary expression
+        case NodeType.BinaryExpression:
+            return solveBinaryExpressionChain(node, false);
+        case NodeType.Literal:
+            return getVariable(node).value;
+    }
+}
+

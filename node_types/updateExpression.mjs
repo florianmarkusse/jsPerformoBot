@@ -1,16 +1,22 @@
-import { getVariable } from './nodeType.mjs';
-
+import { getFromVariables }  from '../types/variable.mjs';
 
 export function handleUpdateExpression(updateNode) {
-    let variable = getVariable(updateNode.argument);
-
     if (updateNode.prefix) {
-        
+        let variable = getFromVariables(updateNode.argument.name);
+        variable.value = eval(String(variable.value) + transformIncrementDecrementOperators(updateNode.operator));
+        return variable;
     } else {
-
-    }
-
-    if (variable.value === undefined) {
-        return 
+        let variable = getFromVariables(updateNode.argument.name, updateNode.operator);
+        return variable;
     }
 }
+
+export function transformIncrementDecrementOperators(operator) {
+    switch (operator) {
+        case '++':
+            return "+ 1";
+        case '--':
+            return "- 1";
+    }
+}
+

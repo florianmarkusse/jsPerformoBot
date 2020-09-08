@@ -1,16 +1,11 @@
-import { processASTNode } from './nodeType.mjs';
+import { processASTNode, processSingleASTNode } from './nodeType.mjs';
 
 export function handleForStatement(forNode) {
-    console.log(forNode.update);
     processASTNode(forNode.init);
-
-    while (test(forNode.test)) {
+    
+    while (processSingleASTNode(forNode.test)) {
         processASTNode(forNode.body);
-        //update()
+        processASTNode(forNode.update);
     }
 
-}
-
-function test(testNode) {
-    return false;
 }

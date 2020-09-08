@@ -1,3 +1,6 @@
+import lodash from 'lodash';
+import { transformIncrementDecrementOperators } from '../node_types/updateExpression.mjs';
+
 export const VariableType = Object.freeze({
     'unknown': 'unknown',
     'array': 'array', 
@@ -41,10 +44,10 @@ export function clearVariables() {
 }
 
 function doPostfix() {
-    variablesToPostfix.entries().forEach(entry => {
-        let variable = variablesMap.get(entry[0]);
-        variable.value = eval(String(variable.value) + entry[1]);
-    });
+    for (const [key, value] of variablesToPostfix.entries()) {
+        let variable = variablesMap.get(key);
+        variable.value = eval(String(variable.value) + transformIncrementDecrementOperators(value));
+    }
     variablesToPostfix.clear();
 }
 

@@ -19,7 +19,7 @@ function processFile(content) {
     
     walk( ast, {
         enter: function ( node, parent, prop, index ) {
-            console.log(node);
+            console.dir(node);
             console.log(prop);
         },
         leave: function ( node, parent, prop, index ) {

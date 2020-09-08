@@ -1,7 +1,7 @@
 import { NodeType } from './nodeType.mjs'; 
 import { getVariable } from './nodeType.mjs';
 
-export function solveBinaryExpressionChain(baseNode) {
+export function solveBinaryExpressionChain(baseNode, returnVariable) {
 
     let leftValue;
     let rightValue;
@@ -23,7 +23,11 @@ export function solveBinaryExpressionChain(baseNode) {
 
     leftValue.value = eval(String(leftValue.value) + baseNode.operator + String(rightValue.value)); 
 
-    return leftValue;
+    if (returnVariable) {
+        return leftValue;
+    } else {
+        return leftValue.value;
+    }
 }
 
 

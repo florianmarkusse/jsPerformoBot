@@ -1,2 +1,1 @@
-let j = 1;
-let f = j++;
+const lodash = require('lodash');
