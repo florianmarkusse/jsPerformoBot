@@ -1,10 +1,9 @@
-import {Variable, VariableType} from './variable.mjs';
+import {VariableType} from './variable.mjs';
 import { NodeType, getVariable } from '../node_types/nodeType.mjs';
 
-export class ObjectVariable extends Variable {
+export class ObjectVariable {
 
     constructor(properties) {
-        super();
         this.type = VariableType.object;
 
         this.propertiesMap = new Map();

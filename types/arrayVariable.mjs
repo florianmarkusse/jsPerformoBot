@@ -1,29 +1,20 @@
-import {Variable, VariableType} from './variable.mjs';
+import {VariableType} from './variable.mjs';
 import { getVariable } from '../node_types/nodeType.mjs';
+import { ReverseArrayWrite } from '../fixes/reverseArrayWrite.mjs';
+import { addToFixSet } from '../fixes/fix.mjs';
+import { deleteFromFixSet } from '../fixes/fix.mjs';
 
-export const ArrayState = Object.freeze({
-    'unkown': 'unkown', 
-    'numeric': 'numeric',
-    'nonNumeric': 'nonNumeric',
-})
-
-export const ContiguityResult = Object.freeze({
-    'fine':'fine',
-    'nonNumeric': 'nonNumeric',
-    'nonContiguous':'nonContiguous',
-})
-
-export class ArrayVariable extends Variable {
+export class ArrayVariable {
     constructor(elements) {
-        super();
-
         this.elements = [];
 
         elements.forEach(element => {
             this.addElement(element);
         });
 
-        this.arrayState = checkArrayType(elements);
+        // Map from variables or constants to which index in the array they set.
+        this.setMap = new Map();
+        this.fix = undefined;
         this.type = VariableType.array;
     }
 
@@ -35,62 +26,41 @@ export class ArrayVariable extends Variable {
         return this.elements[index];
     }
 
-    set(index, element) {
+    set(index, element, key, name) {
+        if (this.firstWrite(index)) {
+            this.setMap.set(index, key);
+        }
         this.elements[index] = element;
+        this.needsFixing(name);
     }
 
+    firstWrite(index) {
+        return (this.elements[index] === undefined);
+    } 
 
-    updateArrayVariable(key, value) {
 
-        // Check for non-contigious array usage.
-        this.checkForcontiguity(key);
-        // Check for numeric to non-numeric array transformation.
-        this.checkNumericToNonNumeric(value);
-
-        this.elements[key] = value;
-    }
-
-    checkForcontiguity(key) {
-        if (!Number.isInteger(key) || key < 0) {
-            return ContiguityResult.nonNumeric;
-        } else {
-            if (key > this.elements.length) {
-                return ContiguityResult.nonContiguous;
-            }
+    setMapPair(key, index) {
+        if (this.firstWrite(index)) {
+            this.setMap.set(index, key);
         }
-        return ContiguityResult.fine;
     }
 
-    checkNumericToNonNumeric(value) {
-        
-        if (isNaN(value)) {
-            if (this.arrayState === ArrayState.numeric) {
-                console.log(`switched '${this.name}' array from numeric to non-numeric`);
-                this.arrayState = ArrayState.nonNumeric;
-                return true;
-            }
-            this.arrayState = ArrayState.nonNumeric;
-        } else {
-            this.arrayState = ArrayState.numeric;
+    needsFixing(name) {
+        if (this.isReverse(Array.from(this.setMap.keys()))) {
+            console.log("is written to in reverse");
+            
+            deleteFromFixSet(this.fix);
+            this.fix = new ReverseArrayWrite(this.setMap, name);
+            addToFixSet(this.fix);
         }
-        return false;
-    }
-}
-
-
-function checkArrayType(elements) {
-    let arrayType = ArrayState.unkown;
-
-
-    if (elements.length > 0) {
-        arrayType = ArrayState.numeric;
     }
 
-    elements.forEach(element => {
-        if (isNaN(element.value)) {
-            arrayType = ArrayState.nonNumeric;
+    isReverse(array) {
+        if (array.length <= 1) {
+            return false;
         }
-    });
-
-    return arrayType;
+        return array.every(function (x, i) {
+            return i === 0 || x === array[i - 1] - 1;
+        });
+    }
 }

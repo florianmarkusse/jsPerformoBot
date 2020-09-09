@@ -1,9 +1,7 @@
-import {Variable, VariableType} from './variable.mjs';
+import {VariableType} from './variable.mjs';
 
-export class LiteralVariable extends  Variable {
+export class LiteralVariable {
     constructor(value) {
-        super();
-
         this.value = value;
         this.type = VariableType.literal;
     }

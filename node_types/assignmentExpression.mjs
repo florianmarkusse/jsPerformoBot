@@ -24,9 +24,25 @@ export function handleAssignmentExpression(assignmentNode) {
             if (variable !== undefined && variable.type === right.type && variable.type === VariableType.literal && assignmentNode.operator !== "=") {
                 variable.value = solveOperator(variable.value, assignmentNode.operator, right.value);
             } else {
-                result[0].set(result[1], right);
+                result[0].set(result[1], right, getNameOrConstant(assignmentNode.left.property), digUntilBase(assignmentNode.left));
             }
             break;
+    }
+}
+
+function getNameOrConstant(node) {
+    if (node.name === undefined) {
+        return node.value;
+    } else {
+        return node.name;
+    }
+}
+
+function digUntilBase(node) {
+    if (node.object.type === NodeType.MemberExpression) {
+        return digUntilBase(node.object);
+    } else {
+        return node.object.name;
     }
 }
 

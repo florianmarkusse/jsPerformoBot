@@ -1,8 +1,7 @@
-import {Variable, VariableType} from './variable.mjs';
+import {VariableType} from './variable.mjs';
 
-export class UnknownVariable extends Variable {
+export class UnknownVariable {
     constructor() {
-        super();
         this.type = VariableType.unknown;
     }
 }

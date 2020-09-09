@@ -9,13 +9,6 @@ export const VariableType = Object.freeze({
     'undefined':'undefined',
 });
 
-export class Variable {
-
-    constructor() {
-    }
-
-}
-
 let variablesMap = new Map();
 let variablesToPostfix = new Map();
 
@@ -38,9 +31,10 @@ export function getVariables() {
     return variablesMap;
 }
 
-export function clearVariables() {
+export function clearVariablesMap() {
     doPostfix();
     variablesMap.clear();
+    variablesToPostfix.clear();
 }
 
 function doPostfix() {

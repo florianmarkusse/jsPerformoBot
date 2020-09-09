@@ -4,7 +4,9 @@ import escodegen from 'escodegen';
 
 
 import { processASTNode } from './node_types/nodeType.mjs';
-import { clearVariables, getVariables } from './types/variable.mjs';
+import { clearVariablesMap, getVariables } from './types/variable.mjs';
+import { getFixSet } from './fixes/fix.mjs';
+import { clearFixSet } from './fixes/fix.mjs';
 
 fs.readFile('./example.js', function read(err, data) {
     if (err) {
@@ -12,24 +14,36 @@ fs.readFile('./example.js', function read(err, data) {
     }
     const content = data;
 
-    processFile(content); 
+    do {
+        let ast = processFile(content);
+        const fixToDo = getFixSet().value;
+        if (fixToDo !== undefined) {
+            fixToDo.fix(ast);
+        }
+    } while(fixToDo !== undefined);
 });
 
 function processFile(content) {
     const ast = espree.parse(content, { tokens: false, ecmaVersion: 11 });
 
-    clearVariables();
+    clearGlobals();
     processASTNode(ast);
     
-    let result = escodegen.generate(ast);
-    console.log(result);
-
-
     getVariables().forEach(element => {
         console.log(element);
     });
+
+    getFixSet().forEach(fix => {
+        console.log(fix);
+    })
+
+    return ast;
 }
 
+function clearGlobals() {
+    clearVariablesMap();
+    clearFixSet();
+}
 
 
 
