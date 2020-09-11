@@ -26,6 +26,20 @@ export function solveMemberExpression(memberNode) {
     }
 }
 
+export function solveNamesMemberExpression(memberNode) {
+    let objectVariable = digUntilBase(memberNode);
+    let propertyVariable = getPropertyVariable(memberNode.property);
+    return [objectVariable, propertyVariable];
+}
+
+export function digUntilBase(node) {
+    if (node.object.type === NodeType.MemberExpression) {
+        return digUntilBase(node.object);
+    } else {
+        return node.object.name;
+    }
+}
+
 function getPropertyVariable(propertyNode) {
     switch (propertyNode.type) {
         case NodeType.Identifier:

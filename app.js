@@ -14,13 +14,26 @@ fs.readFile('./example.js', function read(err, data) {
     }
     const content = data;
 
+    let ast = processFile(content);
+    let iterator = getFixSet().values();
+    let fixToDo = iterator.next().value;
+    console.log(fixToDo);
+    if (fixToDo !== undefined) {
+        fixToDo.fix(ast);
+    }
+
+    /*
+    let fixToDo;
     do {
         let ast = processFile(content);
-        const fixToDo = getFixSet().value;
+        let iterator = getFixSet().values();
+        fixToDo = iterator.next().value;
+        console.log(fixToDo);
         if (fixToDo !== undefined) {
             fixToDo.fix(ast);
         }
     } while(fixToDo !== undefined);
+    */
 });
 
 function processFile(content) {
@@ -28,7 +41,7 @@ function processFile(content) {
 
     clearGlobals();
     processASTNode(ast);
-    
+    /*    
     getVariables().forEach(element => {
         console.log(element);
     });
@@ -36,7 +49,7 @@ function processFile(content) {
     getFixSet().forEach(fix => {
         console.log(fix);
     })
-
+    */
     return ast;
 }
 

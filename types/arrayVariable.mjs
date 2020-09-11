@@ -27,7 +27,7 @@ export class ArrayVariable {
     }
 
     set(index, element, key, name) {
-        if (this.firstWrite(index)) {
+        if (this.firstWrite(index) && isNaN(key)) {
             this.setMap.set(index, key);
         }
         this.elements[index] = element;
@@ -46,9 +46,7 @@ export class ArrayVariable {
     }
 
     needsFixing(name) {
-        if (this.isReverse(Array.from(this.setMap.keys()))) {
-            console.log("is written to in reverse");
-            
+        if (this.isReverse(Array.from(this.setMap.keys()))) { 
             deleteFromFixSet(this.fix);
             this.fix = new ReverseArrayWrite(this.setMap, name);
             addToFixSet(this.fix);

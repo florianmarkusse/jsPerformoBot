@@ -1,5 +1,5 @@
 import { NodeType, getVariable } from './nodeType.mjs'; 
-import { solveMemberExpression } from './memberExpression.mjs';
+import { solveMemberExpression, digUntilBase } from './memberExpression.mjs';
 import { VariableType, getFromVariables, setToVariables } from '../types/variable.mjs';
 
 
@@ -35,14 +35,6 @@ function getNameOrConstant(node) {
         return node.value;
     } else {
         return node.name;
-    }
-}
-
-function digUntilBase(node) {
-    if (node.object.type === NodeType.MemberExpression) {
-        return digUntilBase(node.object);
-    } else {
-        return node.object.name;
     }
 }
 
