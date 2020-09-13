@@ -84,3 +84,23 @@ export function getFirstLoopNodeArrayWrittenTo(ast, arrayName, variableName) {
 
     return assignmentNode;
 }
+
+export function getParent(ast, childNode) {
+    let parentNode;
+    let found = false;
+
+    walk( ast, {
+        enter: function ( node, parent, prop, index ) {
+
+            if (!found && node === childNode) {
+                parentNode = parent;
+                found = true;
+            }
+
+        },
+        leave: function ( node, parent, prop, index ) {
+        }
+    });
+
+    return parentNode;
+}

@@ -3,14 +3,18 @@ import { getVariable } from '../node_types/nodeType.mjs';
 import { ReverseArrayWrite } from '../fixes/reverseArrayWrite.mjs';
 import { addToFixSet } from '../fixes/fix.mjs';
 import { deleteFromFixSet } from '../fixes/fix.mjs';
+import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 
 export class ArrayVariable {
     constructor(elements) {
         this.elements = [];
+        
 
         elements.forEach(element => {
             this.addElement(element);
         });
+
+        this.setValue();
 
         // Map from variables or constants to which index in the array they set.
         this.setMap = new Map();
@@ -20,10 +24,23 @@ export class ArrayVariable {
 
     addElement(elementNode) {
         this.elements[this.elements.length] = getVariable(elementNode);
+        this.setValue();
+    }
+
+    setValue() {
+        let array = [];
+        for (const element of this.elements) {
+            array[array.length] = element.value;
+        }
+        this.value = array;
     }
 
     get(index) {
-        return this.elements[index];
+        if (this.elements[index] !== undefined) {
+            return this.elements[index];
+        } else {
+            return new UndefinedVariable();
+        }
     }
 
     set(index, element, key, name) {
@@ -32,6 +49,7 @@ export class ArrayVariable {
         }
         this.elements[index] = element;
         this.needsFixing(name);
+        this.setValue();
     }
 
     firstWrite(index) {

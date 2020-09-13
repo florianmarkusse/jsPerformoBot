@@ -1,11 +1,12 @@
 import {VariableType} from './variable.mjs';
 import { NodeType, getVariable } from '../node_types/nodeType.mjs';
+import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 
 export class ObjectVariable {
 
     constructor(properties) {
         this.type = VariableType.object;
-
+        this.value = {};
         this.propertiesMap = new Map();
 
         properties.forEach(property => {
@@ -26,7 +27,11 @@ export class ObjectVariable {
     }
     
     get(name)  {
-        return this.propertiesMap.get(name);
+        if (this.propertiesMap.has(name)) {
+            return this.propertiesMap.get(name);
+        } else {
+            return new UndefinedVariable();
+        }
     }
 
     set(key, value) {

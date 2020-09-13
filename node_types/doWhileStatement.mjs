@@ -4,7 +4,7 @@ export function handleDoWhileStatement(doWhileNode) {
     
     processASTNode(doWhileNode.body);
 
-    while (processSingleASTNode(doWhileNode.test)) {
+    while (processSingleASTNode(doWhileNode.test).value) {
         processASTNode(doWhileNode.body);
     }
 

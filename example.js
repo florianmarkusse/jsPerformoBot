@@ -1,4 +1,3 @@
-let arr = []
-for (let i = 9; i >= 0; i--) {
-    arr[i] = 5;
+for (let i = 0; i < (3 | undefined); i++) {
+
 }

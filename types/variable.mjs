@@ -1,5 +1,7 @@
 import lodash from 'lodash';
 import { transformIncrementDecrementOperators } from '../node_types/updateExpression.mjs';
+import { NaNVariable } from './NaNVariable.mjs';
+import { UndefinedVariable } from './undefinedVariable.mjs';
 
 export const VariableType = Object.freeze({
     'unknown': 'unknown',
@@ -7,6 +9,7 @@ export const VariableType = Object.freeze({
     'literal': 'literal',
     'object': 'object',
     'undefined':'undefined',
+    'NaN':'NaN',
 });
 
 let variablesMap = new Map();
@@ -14,6 +17,12 @@ let variablesToPostfix = new Map();
 
 export function getFromVariables(name, operator) {
     doPostfix();
+    if (name === 'NaN') {
+        return new NaNVariable();
+    }
+    if (name === "undefined") {
+        return new UndefinedVariable();
+    }
     let variable = variablesMap.get(name);
     if (operator !== undefined && variable.value !== undefined) {
         variablesToPostfix.set(name, operator);
@@ -50,6 +59,7 @@ export function getCopyOrReference(variable) {
         case VariableType.literal:
         case VariableType.undefined:
         case VariableType.unknown:
+        case VariableType.NaN:
             return lodash.cloneDeep(variable);
         case VariableType.array:
         case VariableType.object:

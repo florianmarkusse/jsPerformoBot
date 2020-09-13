@@ -15,6 +15,7 @@ import { solveBinaryExpressionChain } from './binaryExpression.mjs';
 import { solveMemberExpression } from './memberExpression.mjs';
 import { handleWhileStatement } from './whileStatement.mjs';
 import { handleDoWhileStatement } from './doWhileStatement.mjs';
+import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
@@ -38,6 +39,9 @@ export const NodeType = Object.freeze({
 })
 
 export function getVariable(rightNode) {
+    if (rightNode === null) {
+        return new UndefinedVariable();
+    }
     switch (rightNode.type) {
         case NodeType.Literal:
             return new LiteralVariable(rightNode.value);
@@ -48,7 +52,7 @@ export function getVariable(rightNode) {
         case NodeType.ArrayExpression:
             return new ArrayVariable(rightNode.elements);
         case NodeType.BinaryExpression:
-            return solveBinaryExpressionChain(rightNode, true);
+            return solveBinaryExpressionChain(rightNode);
         case NodeType.MemberExpression:
             let result = solveMemberExpression(rightNode);
             return getCopyOrReference(result[0].get(result[1]));
@@ -122,7 +126,7 @@ export function processSingleASTNode(node) {
     switch(node.type) {
         // Binary expression
         case NodeType.BinaryExpression:
-            return solveBinaryExpressionChain(node, false);
+            return solveBinaryExpressionChain(node);
         case NodeType.Literal:
             return getVariable(node).value;
     }
