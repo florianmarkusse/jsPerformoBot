@@ -11,7 +11,7 @@ export function handleAssignmentExpression(assignmentNode) {
 
             let left = getFromVariables(assignmentNode.left.name);
             
-            if (left.type === right.type && left.type === VariableType.literal) {
+            if (left.type === right.type && left.type === VariableType.literal && assignmentNode.operator !== "=") {
                 left.value = solveOperator(left.value, assignmentNode.operator, right.value);
             } else {
                 setToVariables(assignmentNode.left.name, right);
