@@ -4,7 +4,9 @@ import fs from 'fs';
 import pkg from 'estree-walker'; 
 const {walk} = pkg;
 
-fs.readFile('./example.js', function read(err, data) {
+const fileString = './test_files/' + String(process.argv[2]);
+
+fs.readFile(fileString, function read(err, data) {
     if (err) {
         throw err;
     }

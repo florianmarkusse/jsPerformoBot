@@ -8,7 +8,9 @@ import { clearVariablesMap, getVariables } from './types/variable.mjs';
 import { getFixSet } from './fixes/fix.mjs';
 import { clearFixSet } from './fixes/fix.mjs';
 
-fs.readFile('./example.js', function read(err, data) {
+const fileString = './test_files/' + String(process.argv[2]);
+
+fs.readFile(fileString, function read(err, data) {
     if (err) {
         throw err;
     }

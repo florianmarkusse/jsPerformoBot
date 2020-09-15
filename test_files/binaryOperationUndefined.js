@@ -1,3 +1,10 @@
+/**
+ * Test file for performance problem: "Binary operation on undefined".
+ * A binary operation which includes a variable that is undefined
+ * takes extra time and is unnecessary since the result is already
+ * predetermined.
+ */
+
 // Bitwise or with undefined => result should be y = 2.
 var x, y, rep = 300;//300000000;
 for (var i = 0; i < rep; i++) {
