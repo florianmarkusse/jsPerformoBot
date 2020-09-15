@@ -1,9 +1,10 @@
+import { unaryOperation } from '../common/stringEval.mjs';
 import { getFromVariables }  from '../types/variable.mjs';
 
 export function handleUpdateExpression(updateNode) {
     if (updateNode.prefix) {
         let variable = getFromVariables(updateNode.argument.name);
-        variable.value = eval(String(variable.value) + transformIncrementDecrementOperators(updateNode.operator));
+        variable.value = unaryOperation(variable.value, transformIncrementDecrementOperators(updateNode.operator))
         return variable;
     } else {
         let variable = getFromVariables(updateNode.argument.name, updateNode.operator);

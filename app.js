@@ -12,34 +12,25 @@ fs.readFile('./example.js', function read(err, data) {
     if (err) {
         throw err;
     }
-    const content = data;
 
-    /*
-    let ast = processFile(content);
-    let iterator = getFixSet().values();
-    let fixToDo = iterator.next().value;
-
-    console.log(escodegen.generate(ast));
-    */
-
+    let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 });
     
     let fixToDo;
     do {
-        let ast = processFile(content);
+        processAST(ast);
         let iterator = getFixSet().values();
         fixToDo = iterator.next().value;
         if (fixToDo !== undefined) {
             fixToDo.fix(ast);
+            
         }
-        console.log(escodegen.generate(ast));
-    } while(false/*fixToDo !== undefined*/);
+    } while(fixToDo !== undefined);
 
-    
+    console.log(escodegen.generate(ast));
     
 });
 
-function processFile(content) {
-    const ast = espree.parse(content, { tokens: false, ecmaVersion: 11 });
+function processAST(ast) {
 
     clearGlobals();
     processASTNode(ast);

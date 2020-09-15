@@ -2,6 +2,7 @@ import lodash from 'lodash';
 import { transformIncrementDecrementOperators } from '../node_types/updateExpression.mjs';
 import { NaNVariable } from './NaNVariable.mjs';
 import { UndefinedVariable } from './undefinedVariable.mjs';
+import { unaryOperation } from '../common/stringEval.mjs';
 
 export const VariableType = Object.freeze({
     'unknown': 'unknown',
@@ -17,16 +18,20 @@ let variablesToPostfix = new Map();
 
 export function getFromVariables(name, operator) {
     doPostfix();
-    if (name === 'NaN') {
-        return new NaNVariable();
-    }
-    if (name === "undefined") {
-        return new UndefinedVariable();
-    }
+
     let variable = variablesMap.get(name);
-    if (operator !== undefined && variable.value !== undefined) {
-        variablesToPostfix.set(name, operator);
-    } 
+    if (variable === undefined) {
+        if ((typeof name) === "undefined" || name === "undefined") {
+            return new UndefinedVariable();
+        }
+        if (isNaN(name) || name === "NaN") {
+            return new NaNVariable();
+        }
+    } else {
+        if (operator !== undefined && variable.value !== undefined) {
+            variablesToPostfix.set(name, operator);
+        }
+    }
     return variable;
 }
 
@@ -49,7 +54,7 @@ export function clearVariablesMap() {
 function doPostfix() {
     for (const [key, value] of variablesToPostfix.entries()) {
         let variable = variablesMap.get(key);
-        variable.value = eval(String(variable.value) + transformIncrementDecrementOperators(value));
+        variable.value = unaryOperation(variable.value, transformIncrementDecrementOperators(value))
     }
     variablesToPostfix.clear();
 }

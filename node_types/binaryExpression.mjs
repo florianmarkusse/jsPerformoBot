@@ -9,6 +9,7 @@ import { LiteralVariable } from '../types/literalVariable.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 import { addToFixSet } from '../fixes/fix.mjs';
 import { BinaryUndefined } from '../fixes/binaryUndefined.mjs';
+import { binaryOperation } from '../common/stringEval.mjs';
 
 export function solveBinaryExpressionChain(baseNode) {
 
@@ -89,7 +90,7 @@ export function solveBinaryExpressionChain(baseNode) {
         result = new NaNVariable();
     } 
     else {
-        let evalResult = eval(String(leftValue.value) + baseNode.operator + String(rightValue.value));
+        let evalResult = binaryOperation(leftValue.value, baseNode.operator, rightValue.value);
 
         if (isNaN(evalResult)) {
             result = new NaNVariable();
