@@ -16,6 +16,7 @@ import { solveMemberExpression } from './memberExpression.mjs';
 import { handleWhileStatement } from './whileStatement.mjs';
 import { handleDoWhileStatement } from './doWhileStatement.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
+import { solveLogicalExpressionChain } from './LogicalExpression.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
@@ -36,6 +37,7 @@ export const NodeType = Object.freeze({
     'DoWhileStatement':'DoWhileStatement',
     'BlockStatement':'BlockStatement',
     'CallExpression':'CallExpression',
+    'LogicalExpression':'LogicalExpression',
 })
 
 export function getVariable(rightNode) {
@@ -105,7 +107,7 @@ export function processASTNode(ast) {
                 // Sequence of expressions.
                 case NodeType.SequenceExpression:
                     node.expressions.forEach(expression => {
-                        handleAssignmentExpression(expression);
+                        processASTNode(expression);
                     });
                     this.skip();
                     break;
@@ -124,7 +126,8 @@ export function processASTNode(ast) {
 
 export function processSingleASTNode(node) {
     switch(node.type) {
-        // Binary expression
+        case NodeType.LogicalExpression:
+            return solveLogicalExpressionChain(node);
         case NodeType.BinaryExpression:
             return solveBinaryExpressionChain(node);
         case NodeType.Literal:

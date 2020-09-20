@@ -22,11 +22,12 @@ fs.readFile(fileString, function read(err, data) {
         processAST(ast);
         let iterator = getFixSet().values();
         fixToDo = iterator.next().value;
+        console.log(fixToDo);
         if (fixToDo !== undefined) {
             fixToDo.fix(ast);
             
         }
-    } while(fixToDo !== undefined);
+    } while(/*fixToDo !== undefined*/false);
 
     console.log(escodegen.generate(ast));
     

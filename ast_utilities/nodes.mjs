@@ -16,5 +16,38 @@ export function createIdentifierNode(name) {
         start: 0,
         end: 0,
         name: name,
-    }
+    };
+}
+
+export function createAssignmentExpressionNode(name, value, op) {
+    return {
+        type: NodeType.AssignmentExpression,
+        start: 0,
+        end: 0,
+        operator: op,
+        left: createIdentifierNode(name),
+        right: createLiteralNode(value),
+    };
+}
+
+export function createUpdateExpressionNode(op, pref, name) {
+    return {
+        type: NodeType.UpdateExpression,
+        start: 0,
+        end: 0,
+        operator: op,
+        prefix: pref,
+        argument: createIdentifierNode(name),
+    };
+}
+
+export function createBinaryExpressionNode(name, value, op) {
+    return {
+        type: NodeType.BinaryExpression,
+        start: 0,
+        end: 0,
+        left: createIdentifierNode(name),
+        operator: op,
+        right: createLiteralNode(value),
+    };
 }

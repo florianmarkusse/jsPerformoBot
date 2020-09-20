@@ -30,7 +30,9 @@ export class ArrayVariable {
     setValue() {
         let array = [];
         for (const element of this.elements) {
-            array[array.length] = element.value;
+            if (element !== undefined) {
+                array[array.length] = element.value;
+            }
         }
         this.value = array;
     }
