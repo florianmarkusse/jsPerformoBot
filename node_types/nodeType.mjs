@@ -58,7 +58,7 @@ export function getVariable(rightNode) {
             return solveBinaryExpressionChain(rightNode);
         case NodeType.MemberExpression:
             let result = solveMemberExpression(rightNode);
-            return getCopyOrReference(result[0].get(result[1]));
+            return getCopyOrReference(result[0].getWithNode(result[1], rightNode));
         case NodeType.ConditionalExpression:
             return solveConditionalExpression(rightNode);
         case NodeType.UpdateExpression:

@@ -99,4 +99,8 @@ export class BinaryUndefined {
                 console.error(parentNode);
         }
     }
+
+    isEqualTo(binaryUndefined) {
+        return false;
+    }
 }

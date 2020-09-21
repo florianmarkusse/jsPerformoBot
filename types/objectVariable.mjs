@@ -1,6 +1,8 @@
 import {VariableType} from './variable.mjs';
 import { NodeType, getVariable } from '../node_types/nodeType.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
+import { addToFixSet } from '../fixes/fix.mjs';
+import { UndefinedRead } from '../fixes/undefinedRead.mjs';
 
 export class ObjectVariable {
 
@@ -25,11 +27,20 @@ export class ObjectVariable {
             let value = getVariable(property.value);
             this.propertiesMap.set(key, value);
     }
-    
+
     get(name)  {
         if (this.propertiesMap.has(name)) {
             return this.propertiesMap.get(name);
         } else {
+            return new UndefinedVariable();
+        }
+    }
+    
+    getWithNode(name, node)  {
+        if (this.propertiesMap.has(name)) {
+            return this.propertiesMap.get(name);
+        } else {
+            addToFixSet(new UndefinedRead(node));
             return new UndefinedVariable();
         }
     }

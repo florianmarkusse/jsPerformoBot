@@ -4,6 +4,7 @@ import { ReverseArrayWrite } from '../fixes/reverseArrayWrite.mjs';
 import { addToFixSet } from '../fixes/fix.mjs';
 import { deleteFromFixSet } from '../fixes/fix.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
+import { UndefinedRead } from '../fixes/undefinedRead.mjs';
 
 export class ArrayVariable {
     constructor(elements) {
@@ -18,7 +19,7 @@ export class ArrayVariable {
 
         // Map from variables or constants to which index in the array they set.
         this.setMap = new Map();
-        this.fix = undefined;
+        this.reverseFix = undefined;
         this.type = VariableType.array;
     }
 
@@ -45,6 +46,15 @@ export class ArrayVariable {
         }
     }
 
+    getWithNode(index, node) {
+        if (this.elements[index] !== undefined) {
+            return this.elements[index];
+        } else {
+            addToFixSet(new UndefinedRead(node));
+            return new UndefinedVariable();
+        }
+    }
+
     set(index, element, key, name) {
         if (this.firstWrite(index) && isNaN(key)) {
             this.setMap.set(index, key);
@@ -67,9 +77,9 @@ export class ArrayVariable {
 
     needsFixing(name) {
         if (this.isReverse(Array.from(this.setMap.keys()))) { 
-            deleteFromFixSet(this.fix);
-            this.fix = new ReverseArrayWrite(this.setMap, name);
-            addToFixSet(this.fix);
+            deleteFromFixSet(this.reverseFix);
+            this.reverseFix = new ReverseArrayWrite(this.setMap, name);
+            addToFixSet(this.reverseFix);
         }
     }
 
