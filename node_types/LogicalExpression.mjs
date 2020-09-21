@@ -5,8 +5,7 @@ import { NodeType } from "./nodeType.mjs";
 
 
 export function solveLogicalExpressionChain(baseNode) {
-    console.log(baseNode);
-
+    
     let leftValue;
     let rightValue;
 

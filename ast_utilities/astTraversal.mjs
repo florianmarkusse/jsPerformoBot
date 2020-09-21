@@ -76,22 +76,11 @@ export function getFirstLoopNodeArrayWrittenTo(ast, arrayName, variableName) {
                     case NodeType.ForStatement:
                     case NodeType.WhileStatement:
                     case NodeType.DoWhileStatement:
-                        walk( node, {
-                            enter: function ( withinLoopNode, withinLoopPparent) {
-                                if (withinLoopPparent && 
-                                    withinLoopPparent.type === NodeType.AssignmentExpression && 
-                                    withinLoopNode.type === NodeType.MemberExpression) {
-                                    let objectProperty = solveNamesMemberExpression(withinLoopNode);
-                                    if (objectProperty[0] === arrayName && objectProperty[1] === variableName) {
-                                        assignmentNode = node;
-                                        done = true;
-                                    }
-                                }
-
-                            },
-                            leave: function ( node, parent, prop, index ) {
-                            }
-                        } );
+                        let result = walkAndFindFirstLoopNode(node, arrayName, variableName);
+                        if (result) {
+                            assignmentNode = result;
+                            done = true;
+                        }
                         this.skip();
                         break;
                 }
@@ -102,6 +91,45 @@ export function getFirstLoopNodeArrayWrittenTo(ast, arrayName, variableName) {
     });
 
     return assignmentNode;
+}
+
+function walkAndFindFirstLoopNode(loopNode, arrayName, variableName) {
+
+    let resultNode;
+    let done = false;
+
+    walk( loopNode.body, {
+        enter: function ( node, parent, prop, index ) {
+
+            if (!done) {
+                switch (node.type) {
+                    case NodeType.ForStatement:
+                    case NodeType.WhileStatement:
+                    case NodeType.DoWhileStatement:
+                        let result = walkAndFindFirstLoopNode(node, arrayName, variableName);
+                        if (result) {
+                            resultNode = result;
+                            done = true;
+                        }
+                        this.skip();
+                        break;
+                    default:
+                        if (parent && parent.type === NodeType.AssignmentExpression && node.type === NodeType.MemberExpression) {
+                            let objectProperty = solveNamesMemberExpression(node);
+                            if (objectProperty[0] === arrayName && objectProperty[1] === variableName) {
+                                resultNode = loopNode;
+                                done = true;
+                            }
+                        }
+                        break;
+                }
+            }
+        },
+        leave: function ( node, parent, prop, index ) {
+        }
+    });
+
+    return resultNode;
 }
 
 export function getParent(ast, childNode) {
@@ -134,12 +162,20 @@ export function getUpdateNodesInLoop(loopNode, name) {
             switch (node.type) {
                 case NodeType.UpdateExpression:
                     if (node.argument.name === name) {
-                        nodes[nodes.length] = node;
+                        if (parent && parent.type && parent.type === NodeType.ExpressionStatement) {
+                            nodes[nodes.length] = parent;
+                        } else {
+                            nodes[nodes.length] = node;
+                        }
                     }
                     break;
                 case NodeType.AssignmentExpression:
                     if (node.left.name === name && node.operator.length > 1) {
-                        nodes[nodes.length] = node;
+                        if (parent && parent.type && parent.type === NodeType.ExpressionStatement) {
+                            nodes[nodes.length] = parent;
+                        } else {
+                            nodes[nodes.length] = node;
+                        }
                     }
                     break;
             }
@@ -182,4 +218,23 @@ export function replaceNodeFromAST(ast, nodeToReplace, replaceNode) {
     });
 
     return ast;
+}
+
+export function nodeUsesIdentifier(node, name) {
+
+    let uses = false;
+
+    walk( node, {
+        enter: function ( node, parent, prop, index ) {
+
+            if (node.name !== undefined && node.name === name) {
+                uses = true;
+            }
+
+        },
+        leave: function ( node, parent, prop, index ) {
+        }
+    });
+
+    return uses;
 }

@@ -2,11 +2,16 @@ import lodash from 'lodash';
 
 import { getUpdateNodesInLoop } from '../ast_utilities/astTraversal.mjs';
 import { getNodelastAssignedVariable } from '../ast_utilities/astTraversal.mjs';
+import { getParent } from '../ast_utilities/astTraversal.mjs';
 import { removeNodeFromAST } from '../ast_utilities/astTraversal.mjs';
 import { replaceNodeFromAST } from '../ast_utilities/astTraversal.mjs';
 import { getASTUntil } from '../ast_utilities/astTraversal.mjs';
+import { nodeUsesIdentifier } from '../ast_utilities/astTraversal.mjs';
 import { getFirstLoopNodeArrayWrittenTo } from '../ast_utilities/astTraversal.mjs';
 import { createUpdateExpressionNode } from '../ast_utilities/nodes.mjs';
+import { createLogicalExpressionNode } from '../ast_utilities/nodes.mjs';
+import { createVariableDeclaratorNode } from '../ast_utilities/nodes.mjs';
+import { createExpressionStatementNode } from '../ast_utilities/nodes.mjs';
 import { createBinaryExpressionNode } from '../ast_utilities/nodes.mjs';
 import { createAssignmentExpressionNode } from '../ast_utilities/nodes.mjs';
 import { createLiteralNode } from '../ast_utilities/nodes.mjs';
@@ -19,36 +24,51 @@ export class ReverseArrayWrite {
     }
 
     fix(ast) {
-        this.reverseMap = this.findvariables(this.setMap);
-        this.filterReverseMap();
-        for (const [key, value] of this.reverseMap) {
+        let reverseMap = this.findvariables(this.setMap);
+        reverseMap = this.filterReverseMap(reverseMap);
+        for (const [key, value] of reverseMap) {
             let loopNode = getFirstLoopNodeArrayWrittenTo(ast, this.name, key);
-            //console.log(result);
+
             let updateNodes = getUpdateNodesInLoop(loopNode.update, key);
-            updateNodes.concat(getUpdateNodesInLoop(loopNode.body, key));
+            updateNodes.push(...getUpdateNodesInLoop(loopNode.body.body, key));
 
-            for (const updateNode of updateNodes) {
-                removeNodeFromAST(ast, updateNode);
+            // Check if does more than writing to array.
+            let updateNodesSet = new Set(updateNodes);
+            let nonUpdateLoopNodes = new Set([...loopNode.body.body].filter(x => !updateNodesSet.has(x)))
+
+            let count = 0;
+            for (const nonUpdateLoopNode of nonUpdateLoopNodes) {
+                if (nodeUsesIdentifier(nonUpdateLoopNode, key)) {
+                    count++;
+                }
             }
 
-            let finalUsedNode;
-            if (loopNode.type === NodeType.ForStatement) {
-                finalUsedNode = this.checkInit(loopNode.init, key);
-                loopNode.update = createUpdateExpressionNode('++', false, key);
-            } else {
+            if (count === 1) {
+                for (const updateNode of updateNodes) {
+                    removeNodeFromAST(ast, updateNode);
+                }
 
+                let finalUsedNode;
+                if (loopNode.type === NodeType.ForStatement) {
+                    finalUsedNode = this.checkInit(loopNode.init, key);
+                    loopNode.update = createUpdateExpressionNode('++', false, key);
+                } else {
+                    // Add update at final part of loop.
+                    let newUpdateNode = createExpressionStatementNode(createUpdateExpressionNode('++', false, key));
+                    loopNode.body.body.push(newUpdateNode);
+                }
+                if (finalUsedNode === undefined) {
+                    // Check everything above loop for final use
+                    let copyAST = lodash.cloneDeep(ast);
+                    let ASTUntilLoop = getASTUntil(copyAST, loopNode);
+
+                    finalUsedNode = getNodelastAssignedVariable(ASTUntilLoop, key);   
+                }
+
+                // finalUsedNode -> value[value.length - 1]
+                this.fixFinalUsedNode(finalUsedNode, value[value.length - 1], ast, key);
+                this.fixTestNode(loopNode, value[0] + 1, key);
             }
-            if (finalUsedNode === undefined) {
-                // Check everything above loop for final use
-                let copyAST = lodash.cloneDeep(ast);
-                let ASTUntilLoop = getASTUntil(copyAST, loopNode);
-
-                finalUsedNode = getNodelastAssignedVariable(ASTUntilLoop, key);   
-            }
-
-            // finalUsedNode -> value[value.length - 1]
-            this.fixFinalUsedNode(finalUsedNode, value[value.length - 1], ast, key);
-            this.fixTestNode(loopNode, value[0] + 1, key);
         }
         
     }
@@ -60,43 +80,63 @@ export class ReverseArrayWrite {
                 loopNode.test = createBinaryExpressionNode(name, smallerThanValue, '<');
                 break;
             case NodeType.LogicalExpression:
-                this.logicalExpressionTest(loopNode.test, name);
+                let result = this.logicalExpressionTest(loopNode.test, name);
+                if (result) {
+                    loopNode.test = createLogicalExpressionNode(
+                        createBinaryExpressionNode(name, smallerThanValue, '<'),
+                        result,
+                        '&&'
+                    );
+                } else {
+                    loopNode.test = createBinaryExpressionNode(name, smallerThanValue, '<');
+                }
         }
     }
 
-    logicalExpressionTest(testNode, name) {
+    logicalExpressionTest(baseNode, name) {
 
         let leftResult;
         let rightResult;
 
-        if (testNode.type === NodeType.LogicalExpression) {
-            leftResult = logicalExpressionTest(testNode.left, name);
+        if (baseNode.left.type === NodeType.LogicalExpression) {
+            leftResult = this.logicalExpressionTest(baseNode.left, name);
         } else {
-            leftResult = keepBinaryExpression(baseNode.left, name);
+            leftResult = this.keepBinaryExpression(baseNode.left, name);
         }
     
-        if (testNode.type === NodeType.LogicalExpression) {
-            rightResult = logicalExpressionTest(testNode.right, name);
+        if (baseNode.right.type === NodeType.LogicalExpression) {
+            rightResult = this.logicalExpressionTest(baseNode.right, name);
         } else {
-            rightResult = keepBinaryExpression(baseNode.right, name);
+            rightResult = this.keepBinaryExpression(baseNode.right, name);
         }
 
-        // DO LOGICAL EXPRESSION REMOVAL OF ALL NODES WITH INDEX
+        if (!leftResult && !rightResult) {
+            return false;
+        }
+        if (!leftResult) {
+            return rightResult;
+        }
+        if (!rightResult) {
+            return leftResult;
+        }
 
+        return createLogicalExpressionNode(leftResult, rightResult, baseNode.operator);
     }
 
     keepBinaryExpression(binaryExpressionNode, name) {
         let keep = true;
 
-        if (binaryExpressionNode.left.name !== undefined && binaryExpressionNode.left.name === name) {
-                keep = true; 
+        if (binaryExpressionNode.operator.includes(">") || binaryExpressionNode.operator.includes("<")) {
+            if (binaryExpressionNode.left.name !== undefined && binaryExpressionNode.left.name === name) {
+                keep = false; 
+            }
+
+            if (binaryExpressionNode.right.name !== undefined && binaryExpressionNode.right.name === name) {
+                keep = false; 
+            }
         }
 
-        if (binaryExpressionNode.right.name !== undefined && binaryExpressionNode.right.name === name) {
-            keep = true; 
-        }
-
-        return keep;
+        return keep ? binaryExpressionNode : false;
     }
 
     fillUpdateNode(forLoop) {
@@ -123,18 +163,16 @@ export class ReverseArrayWrite {
                 }
                 break;
             case NodeType.SequenceExpression:
-                console.error("sequence expression in init node at reverseArratWrite.mjs not implemented yet");
+                console.error("sequence expression in init node at reverseArrayWrite.mjs not implemented yet");
                 break;
         }
     }
 
     fixFinalUsedNode(finalUsedNode, setToValue, ast, name) {
 
-        console.log(finalUsedNode);
-
         switch (finalUsedNode.type) {
             case NodeType.VariableDeclarator:
-                finalUsedNode.init = createLiteralNode(setToValue);
+                replaceNodeFromAST(ast, finalUsedNode, createVariableDeclaratorNode(name, setToValue));
                 break;
             case NodeType.AssignmentExpression:
             case NodeType.UpdateExpression:
@@ -169,13 +207,33 @@ export class ReverseArrayWrite {
         return indexToLocations;
     }
 
-    filterReverseMap() {
-        for (const [key, value] of this.reverseMap.entries()) {
+    filterReverseMap(reverseMap) {
+        for (const [key, value] of reverseMap.entries()) {
             if (!isNaN(key) || value.length < 2) {
-                this.reverseMap.delete(key);
+                reverseMap.delete(key);
             }
         }
+        return reverseMap;
     }
 
+    isEqualTo(reverseArrayWrite) {
+        return this.name === reverseArrayWrite.name && compareMaps(this.setMap, reverseArrayWrite.setMap);
+    }
     
+}
+
+function compareMaps(map1, map2) {
+    var testVal;
+    if (map1.size !== map2.size) {
+        return false;
+    }
+    for (var [key, val] of map1) {
+        testVal = map2.get(key);
+        // in cases of an undefined value, make sure the key
+        // actually exists on the object so there are no false positives
+        if (testVal !== val || (testVal === undefined && !map2.has(key))) {
+            return false;
+        }
+    }
+    return true;
 }

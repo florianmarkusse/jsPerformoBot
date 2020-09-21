@@ -1,7 +1,8 @@
 let arr = [];
-let i = 10;
-for (i = 2; i >= 0 && i < 10; i--) {
-    arr[i] = 99;
-    console.log(i);
+for (let i = 10; j >= 0; i--) {
+    arr[i] = i;
 }
-console.log(i);
+
+for (let j = 2; j >= 0; j--) {
+    arr[j] = 99;
+}

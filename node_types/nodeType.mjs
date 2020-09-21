@@ -38,6 +38,7 @@ export const NodeType = Object.freeze({
     'BlockStatement':'BlockStatement',
     'CallExpression':'CallExpression',
     'LogicalExpression':'LogicalExpression',
+    'ExpressionStatement':'ExpressionStatement',
 })
 
 export function getVariable(rightNode) {

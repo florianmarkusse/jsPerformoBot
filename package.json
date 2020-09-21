@@ -14,6 +14,7 @@
   "devDependencies": {},
   "scripts": {
     "binary": "node app.js binaryOperationUndefined.js",
+    "reverse": "node app.js reverseArrayWrite.js",
     "test": "node app.js test.js",
     "debug": "node debug.js test.js"
   },

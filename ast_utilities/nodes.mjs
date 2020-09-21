@@ -30,6 +30,16 @@ export function createAssignmentExpressionNode(name, value, op) {
     };
 }
 
+export function createVariableDeclaratorNode(name, value) {
+    return {
+        type: NodeType.VariableDeclarator,
+        start: 0,
+        end: 0,
+        id: createIdentifierNode(name),
+        init: createLiteralNode(value),
+    }
+}
+
 export function createUpdateExpressionNode(op, pref, name) {
     return {
         type: NodeType.UpdateExpression,
@@ -50,4 +60,24 @@ export function createBinaryExpressionNode(name, value, op) {
         operator: op,
         right: createLiteralNode(value),
     };
+}
+
+export function createLogicalExpressionNode(leftNode, rightNode, op) {
+    return {
+        type: NodeType.LogicalExpression,
+        start: 0,
+        end: 0,
+        left: leftNode,
+        operator: op,
+        right: rightNode,
+    }
+}
+
+export function createExpressionStatementNode(expressionNode) {
+    return {
+        type: NodeType.ExpressionStatement,
+        start: 0,
+        end: 0,
+        expression: expressionNode,
+    }
 }
