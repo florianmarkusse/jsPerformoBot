@@ -18,8 +18,8 @@ for (i = 2; i >= 0 && 10 > 3 && i < 10 &&  7 > 3; i--) {
 
  // Reverse for-loop
  // Result should be the array write operations in natural order.
-for (i = 30; i >= 15; i--) {
-    arr[i] = 35;
+for (let y = 30; y >= 15; y--) {
+    arr[y] = 35;
 }
 
  // Reverse while-loop

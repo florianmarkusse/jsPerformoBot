@@ -17,6 +17,7 @@ import { handleWhileStatement } from './whileStatement.mjs';
 import { handleDoWhileStatement } from './doWhileStatement.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 import { solveLogicalExpressionChain } from './LogicalExpression.mjs';
+import { handleBlockStatement } from './blockStatement.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
@@ -117,7 +118,12 @@ export function processASTNode(ast) {
                     handleUpdateExpression(node);
                     this.skip()
                     break;
-
+                // Block statement.
+                case NodeType.BlockStatement:
+                    handleBlockStatement(node);
+                    this.skip();
+                    break;
+                    
             }
         },
         leave: function ( node, parent, prop, index ) {

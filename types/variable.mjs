@@ -13,13 +13,26 @@ export const VariableType = Object.freeze({
     'NaN':'NaN',
 });
 
-let variablesMap = new Map();
-let variablesToPostfix = new Map();
+let variablesMapArray = [new Map()];
+
+export function increaseScope() {
+    variablesMapArray[variablesMapArray.length] = new Map();
+}
+
+export function decreaseScope() {
+    variablesMapArray.splice(variablesMapArray.length - 1, 1);
+}
 
 export function getFromVariables(name, operator) {
-    doPostfix();
 
-    let variable = variablesMap.get(name);
+    if (operator) {
+        let result = lodash.cloneDeep(getVariable(name));
+        let variable = getVariable(name);
+        variable.value = unaryOperation(variable.value, transformIncrementDecrementOperators(operator));
+        return result;
+    }
+
+    let variable = getVariable(name);
     if (variable === undefined) {
         if ((typeof name) === "undefined" || name === "undefined") {
             return new UndefinedVariable();
@@ -27,36 +40,48 @@ export function getFromVariables(name, operator) {
         if (isNaN(name) || name === "NaN") {
             return new NaNVariable();
         }
-    } else {
-        if (operator !== undefined && variable.value !== undefined) {
-            variablesToPostfix.set(name, operator);
-        }
     }
     return variable;
 }
 
-export function setToVariables(name, variable) {
-    doPostfix();
-    variablesMap.set(name, variable);
+function getVariable(name) {
+    for (let i = variablesMapArray.length - 1; i >= 0; i--) {
+        if (variablesMapArray[i].has(name)) {
+            return variablesMapArray[i].get(name);
+        }
+    }
+
+    return;
+}
+
+export function createVariable(name, variable) {
+    variablesMapArray[variablesMapArray.length - 1].set(name, variable);
+}
+
+export function assignVariable(name, variable) {
+    let index = findScopeOf(name);
+    if (index) {
+        variablesMapArray[index].set(name, variable);
+    } else {
+        console.error("wanted to assign " + name + "to new value but could not find in variables maps");
+    }
+}
+
+function findScopeOf(name) {
+    for (let i = variablesMapArray.length - 1; i >= 0; i--) {
+        if (variablesMapArray[i].has(name)) {
+            return i;
+        }
+    }
+    return;
 }
 
 export function getVariables() {
-    doPostfix();
-    return variablesMap;
+    return variablesMapArray;
 }
 
 export function clearVariablesMap() {
-    doPostfix();
-    variablesMap.clear();
-    variablesToPostfix.clear();
-}
-
-function doPostfix() {
-    for (const [key, value] of variablesToPostfix.entries()) {
-        let variable = variablesMap.get(key);
-        variable.value = unaryOperation(variable.value, transformIncrementDecrementOperators(value))
-    }
-    variablesToPostfix.clear();
+    variablesMapArray = [new Map()];
 }
 
 export function getCopyOrReference(variable) {

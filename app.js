@@ -47,11 +47,11 @@ function processAST(ast) {
     clearGlobals();
     processASTNode(ast);
     
-    /*
-    getVariables().forEach(element => {
+    
+    getVariables()[0].forEach(element => {
         console.log(element);
     });
-    */
+    
 
     /*
     getFixSet().forEach(fix => {
