@@ -2,7 +2,7 @@ import lodash from 'lodash';
 import { transformIncrementDecrementOperators } from '../node_types/updateExpression.mjs';
 import { NaNVariable } from './NaNVariable.mjs';
 import { UndefinedVariable } from './undefinedVariable.mjs';
-import { unaryOperation } from '../common/stringEval.mjs';
+import { postUnaryOperation } from '../common/stringEval.mjs';
 
 export const VariableType = Object.freeze({
     'unknown': 'unknown',
@@ -28,7 +28,7 @@ export function getFromVariables(name, operator) {
     if (operator) {
         let result = lodash.cloneDeep(getVariable(name));
         let variable = getVariable(name);
-        variable.value = unaryOperation(variable.value, transformIncrementDecrementOperators(operator));
+        variable.value = postUnaryOperation(variable.value, transformIncrementDecrementOperators(operator));
         return result;
     }
 

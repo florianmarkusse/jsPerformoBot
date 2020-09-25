@@ -18,6 +18,7 @@ import { handleDoWhileStatement } from './doWhileStatement.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 import { solveLogicalExpressionChain } from './LogicalExpression.mjs';
 import { handleBlockStatement } from './blockStatement.mjs';
+import { handleUnaryExpression } from './unaryExpression.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
@@ -40,6 +41,7 @@ export const NodeType = Object.freeze({
     'CallExpression':'CallExpression',
     'LogicalExpression':'LogicalExpression',
     'ExpressionStatement':'ExpressionStatement',
+    'UnaryExpression':'UnaryExpression',
 })
 
 export function getVariable(rightNode) {
@@ -64,6 +66,8 @@ export function getVariable(rightNode) {
             return solveConditionalExpression(rightNode);
         case NodeType.UpdateExpression:
             return getCopyOrReference(handleUpdateExpression(rightNode));
+        case NodeType.UnaryExpression:
+            return handleUnaryExpression(rightNode);
         case NodeType.CallExpression:
             return new UnknownVariable();
     }
@@ -123,7 +127,11 @@ export function processASTNode(ast) {
                     handleBlockStatement(node);
                     this.skip();
                     break;
-                    
+                // Unary statement.
+                case NodeType.UnaryExpression:
+                    handleUnaryExpression(node);
+                    this.skip();
+                    break;
             }
         },
         leave: function ( node, parent, prop, index ) {

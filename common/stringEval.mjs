@@ -1,6 +1,11 @@
-export function unaryOperation(value, operator) {
+export function postUnaryOperation(value, operator) {
     let string = typeof value !== 'string' ? String(value) : '"' + value + '"';
-    return eval(value + operator);
+    return eval(string + operator);
+}
+
+export function preUnaryOperation(operator, value) {
+    let string = typeof value !== 'string' ? String(value) : '"' + value + '"';
+    return eval(operator + string);
 }
 
 export function binaryOperation(leftValue, operator, rightValue) {
