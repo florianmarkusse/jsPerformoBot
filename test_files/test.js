@@ -1,11 +1,12 @@
-let k = Boolean(true);
-let f = 10;
+let thing = Array.of(3);
+let k = 10;
 
-while (k && false) {
-    f = 10;
-
-    let arr = [];
-    for (let i = 9; i >= 0; i--) {
-        arr[i] = 20;
+if (thing) {
+    if (false) {
+        k += 10;
+    } else {
+        k += 13; 
     }
+} else {
+    k += 3;
 }

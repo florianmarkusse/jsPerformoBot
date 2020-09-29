@@ -19,6 +19,7 @@ import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 import { solveLogicalExpressionChain } from './LogicalExpression.mjs';
 import { handleBlockStatement } from './blockStatement.mjs';
 import { handleUnaryExpression } from './unaryExpression.mjs';
+import { handleIfStatement } from './ifStatement.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
@@ -42,6 +43,7 @@ export const NodeType = Object.freeze({
     'LogicalExpression':'LogicalExpression',
     'ExpressionStatement':'ExpressionStatement',
     'UnaryExpression':'UnaryExpression',
+    'IfStatement':'IfStatement',
 })
 
 export function getVariable(rightNode) {
@@ -130,6 +132,11 @@ export function processASTNode(ast) {
                 // Unary statement.
                 case NodeType.UnaryExpression:
                     handleUnaryExpression(node);
+                    this.skip();
+                    break;
+                // If statement.
+                case NodeType.IfStatement:
+                    handleIfStatement(node);
                     this.skip();
                     break;
             }
