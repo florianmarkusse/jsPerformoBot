@@ -1,6 +1,7 @@
 import lodash from 'lodash';
 import { transformIncrementDecrementOperators } from '../node_types/updateExpression.mjs';
 import { NaNVariable } from './NaNVariable.mjs';
+import { UnknownVariable } from './unknownVariable.mjs';
 import { UndefinedVariable } from './undefinedVariable.mjs';
 import { postUnaryOperation } from '../common/stringEval.mjs';
 
@@ -14,6 +15,15 @@ export const VariableType = Object.freeze({
 });
 
 let variablesMapArray = [new Map()];
+let unknownLoopNumber = 0;
+
+export function increaseUnknownLoopNumber() {
+    unknownLoopNumber++;
+}
+
+export function decreaseUnknownLoopNumber() {
+    unknownLoopNumber--;
+}
 
 export function increaseScope() {
     variablesMapArray[variablesMapArray.length] = new Map();
@@ -58,12 +68,20 @@ export function createVariable(name, variable) {
     variablesMapArray[variablesMapArray.length - 1].set(name, variable);
 }
 
+export function createVariableAt(name, variable) {
+    variablesMapArray[findScopeOf(name)].set(name, variable);
+}
+
 export function assignVariable(name, variable) {
     let index = findScopeOf(name);
-    if (index) {
-        variablesMapArray[index].set(name, variable);
+    if (index >= 0) {
+        if (unknownLoopNumber > 0) {
+            variablesMapArray[index].set(name, new UnknownVariable());
+        } else {
+            variablesMapArray[index].set(name, variable);
+        }
     } else {
-        console.error("wanted to assign " + name + "to new value but could not find in variables maps");
+        console.error("wanted to assign '" + name + "' to new value but could not find in variables maps");
     }
 }
 
@@ -73,7 +91,7 @@ function findScopeOf(name) {
             return i;
         }
     }
-    return;
+    return -1;
 }
 
 export function getVariables() {

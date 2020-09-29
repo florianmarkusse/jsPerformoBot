@@ -146,7 +146,9 @@ export function processSingleASTNode(node) {
         case NodeType.BinaryExpression:
             return solveBinaryExpressionChain(node);
         case NodeType.Literal:
-            return getVariable(node).value;
+        case NodeType.Identifier:
+            return getVariable(node);
+
     }
 }
 

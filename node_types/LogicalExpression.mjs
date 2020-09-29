@@ -1,7 +1,9 @@
 import { createLiteralNode } from "../ast_utilities/nodes.mjs";
 import { binaryOperation } from "../common/stringEval.mjs";
-import { solveBinaryExpressionChain } from "./binaryExpression.mjs";
-import { NodeType } from "./nodeType.mjs";
+import { NodeType, getVariable } from "./nodeType.mjs";
+import { UnknownVariable } from '../types/unknownVariable.mjs';
+import { createCorrectNodeBasedOnValue } from "../ast_utilities/nodes.mjs";
+import { VariableType } from '../types/variable.mjs';
 
 
 export function solveLogicalExpressionChain(baseNode) {
@@ -12,15 +14,19 @@ export function solveLogicalExpressionChain(baseNode) {
     if (baseNode.left.type === NodeType.LogicalExpression) {
         leftValue = solveLogicalExpressionChain(baseNode.left);
     } else {
-        leftValue = solveBinaryExpressionChain(baseNode.left);
+        leftValue = getVariable(baseNode.left);
     }
 
-    if (baseNode.right.type === NodeType.logicalExpression) {
+    if (baseNode.right.type === NodeType.LogicalExpression) {
         rightValue = solveLogicalExpressionChain(baseNode.right);
     } else {
-        rightValue = solveBinaryExpressionChain(baseNode.right);
+        rightValue = getVariable(baseNode.right);
     }
-
-    let logicalResult = binaryOperation(leftValue.value, baseNode.operator, rightValue.value);
-    return createLiteralNode(logicalResult);
+ 
+    if (leftValue.type === VariableType.unknown || rightValue.type === VariableType.unknown) {
+        return new UnknownVariable();
+    } else {
+        let logicalResult = binaryOperation(leftValue.value, baseNode.operator, rightValue.value);
+        return getVariable(createCorrectNodeBasedOnValue(logicalResult));
+    }
 }

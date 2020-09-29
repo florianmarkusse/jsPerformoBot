@@ -81,3 +81,11 @@ export function createExpressionStatementNode(expressionNode) {
         expression: expressionNode,
     }
 }
+
+export function createCorrectNodeBasedOnValue(value) {
+    if (value === undefined || isNaN(value)) {
+        return createIdentifierNode(value);
+    } else {
+        return createLiteralNode(value);
+    }
+}
