@@ -4,4 +4,8 @@ export class UnknownVariable {
     constructor() {
         this.type = VariableType.unknown;
     }
+
+    getWithNode() {
+        return new UnknownVariable();
+    }
 }

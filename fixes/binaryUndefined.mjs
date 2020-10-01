@@ -51,6 +51,12 @@ export class BinaryUndefined {
                 break;
             case VariableType.undefined:
                 this.newNode = BinaryResult.undefined;
+            case VariableType.unknown:
+                if (leftUndefined) {
+                    this.newNode = BinaryResult.keepRight;
+                } else {
+                    this.newNode = BinaryResult.keepLeft;
+                }
         }
     }
 
@@ -61,7 +67,6 @@ export class BinaryUndefined {
 
         switch (this.newNode) {
             case BinaryResult.keepLeft:
-                console.log("keeping left");
                 parentNode[keyToChange] = this.nodeToChange.left;
                 break;
             case BinaryResult.keepRight:

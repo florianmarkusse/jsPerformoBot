@@ -139,7 +139,7 @@ export function getParent(ast, childNode) {
     walk( ast, {
         enter: function ( node, parent, prop, index ) {
 
-            if (!found && node === childNode) {
+            if (!found && nodeEquals(node, childNode)) {
                 parentNode = parent;
                 found = true;
             }
@@ -192,7 +192,7 @@ export function removeNodeFromAST(ast, removeNode) {
     walk( ast, {
         enter: function ( node, parent, prop, index ) {
 
-            if (node.start !== undefined && node.end !== undefined && node.start === removeNode.start && node.end === removeNode.end) {
+            if (nodeEquals(node, removeNode)) {
                 this.remove();
             }
 
@@ -208,7 +208,7 @@ export function replaceNodeFromAST(ast, nodeToReplace, replaceNode) {
     walk( ast, {
         enter: function ( node, parent, prop, index ) {
 
-            if (node.start !== undefined && node.end !== undefined && node.start === nodeToReplace.start && node.end === nodeToReplace.end) {
+            if (nodeEquals(node, nodeToReplace)) {
                 this.replace(replaceNode);
             }
 
@@ -237,4 +237,11 @@ export function nodeUsesIdentifier(node, name) {
     });
 
     return uses;
+}
+
+function nodeEquals(leftNode, rightNode) {
+    return  leftNode.start !== undefined && leftNode.end !== undefined && 
+            rightNode.start !== undefined && rightNode.end !== undefined &&
+            leftNode.start === rightNode.start && leftNode.end === rightNode.end
+            ;
 }
