@@ -3,6 +3,8 @@ import { NodeType, getVariable } from '../node_types/nodeType.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 import { addToFixSet } from '../fixes/fix.mjs';
 import { UndefinedRead } from '../fixes/undefinedRead.mjs';
+import { inUnknownLoop } from './variable.mjs';
+import { UnknownVariable } from "../types/unknownVariable.mjs";
 
 export class ObjectVariable {
 
@@ -46,7 +48,11 @@ export class ObjectVariable {
     }
 
     set(key, value) {
-        this.propertiesMap.set(key, value);
+        if (inUnknownLoop()) {
+            this.propertiesMap.set(key, new UnknownVariable());
+        } else {
+            this.propertiesMap.set(key, value);
+        }
     }
 
 }

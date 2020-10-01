@@ -4,7 +4,9 @@ import { ReverseArrayWrite } from '../fixes/reverseArrayWrite.mjs';
 import { addToFixSet } from '../fixes/fix.mjs';
 import { deleteFromFixSet } from '../fixes/fix.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
+import { UnknownVariable } from "../types/unknownVariable.mjs";
 import { UndefinedRead } from '../fixes/undefinedRead.mjs';
+import { inUnknownLoop } from './variable.mjs';
 
 export class ArrayVariable {
     constructor(elements) {
@@ -59,7 +61,11 @@ export class ArrayVariable {
         if (this.firstWrite(index) && isNaN(key)) {
             this.setMap.set(index, key);
         }
-        this.elements[index] = element;
+        if (inUnknownLoop()) {
+            this.elements[index] = new UnknownVariable();
+        } else {
+            this.elements[index] = element;
+        }
         this.needsFixing(name);
         this.setValue();
     }

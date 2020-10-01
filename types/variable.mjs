@@ -75,7 +75,7 @@ export function createVariableAt(name, variable) {
 export function assignVariable(name, variable) {
     let index = findScopeOf(name);
     if (index >= 0) {
-        if (unknownLoopNumber > 0) {
+        if (inUnknownLoop()) {
             variablesMapArray[index].set(name, new UnknownVariable());
         } else {
             variablesMapArray[index].set(name, variable);
@@ -83,6 +83,10 @@ export function assignVariable(name, variable) {
     } else {
         console.error("wanted to assign '" + name + "' to new value but could not find in variables maps");
     }
+}
+
+export function inUnknownLoop() {
+    return unknownLoopNumber > 0;
 }
 
 function findScopeOf(name) {

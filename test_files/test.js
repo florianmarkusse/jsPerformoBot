@@ -1,12 +1,12 @@
 let thing = Array.of(3);
-let k = 10;
+let arr = {k : 3};
 
 if (thing) {
     if (false) {
-        k += 10;
+        arr.k += 10;
     } else {
-        k += 13; 
+        arr.k += 13; 
     }
 } else {
-    k += 3;
+    arr.k = 35;
 }
