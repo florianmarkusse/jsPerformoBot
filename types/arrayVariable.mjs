@@ -61,7 +61,7 @@ export class ArrayVariable {
         if (this.firstWrite(index) && isNaN(key)) {
             this.setMap.set(index, key);
         }
-        if (inUnknownLoop()) {
+        if (inUnknownLoop(name)) {
             this.elements[index] = new UnknownVariable();
         } else {
             this.elements[index] = element;

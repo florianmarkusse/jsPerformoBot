@@ -15,14 +15,16 @@ export const VariableType = Object.freeze({
 });
 
 let variablesMapArray = [new Map()];
-let unknownLoopNumber = 0;
+let unknownLoopNumber = [];
 
 export function increaseUnknownLoopNumber() {
-    unknownLoopNumber++;
+    unknownLoopNumber[unknownLoopNumber.length] = variablesMapArray.length;
+    increaseScope();
 }
 
 export function decreaseUnknownLoopNumber() {
-    unknownLoopNumber--;
+    unknownLoopNumber.splice(unknownLoopNumber.length - 1, 1);
+    decreaseScope();
 }
 
 export function increaseScope() {
@@ -74,8 +76,9 @@ export function createVariableAt(name, variable) {
 
 export function assignVariable(name, variable) {
     let index = findScopeOf(name);
+
     if (index >= 0) {
-        if (inUnknownLoop()) {
+        if (inUnknownLoop(name)) {
             variablesMapArray[index].set(name, new UnknownVariable());
         } else {
             variablesMapArray[index].set(name, variable);
@@ -85,8 +88,8 @@ export function assignVariable(name, variable) {
     }
 }
 
-export function inUnknownLoop() {
-    return unknownLoopNumber > 0;
+export function inUnknownLoop(name) {
+    return unknownLoopNumber[unknownLoopNumber.length - 1] > findScopeOf(name);
 }
 
 function findScopeOf(name) {
@@ -104,6 +107,7 @@ export function getVariables() {
 
 export function clearVariablesMap() {
     variablesMapArray = [new Map()];
+    unknownLoopNumber = [];
 }
 
 export function getCopyOrReference(variable) {

@@ -47,8 +47,8 @@ export class ObjectVariable {
         }
     }
 
-    set(key, value) {
-        if (inUnknownLoop()) {
+    set(key, value, property, name) {
+        if (inUnknownLoop(name)) {
             this.propertiesMap.set(key, new UnknownVariable());
         } else {
             this.propertiesMap.set(key, value);
