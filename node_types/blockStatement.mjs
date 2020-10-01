@@ -7,9 +7,7 @@ export function handleBlockStatement(blockNode) {
     // New scope
     increaseScope();
 
-    blockNode.body.forEach(node => {
-        processASTNode(node);
-    });
+    processASTNode(blockNode);
 
     // End scope.
     decreaseScope();

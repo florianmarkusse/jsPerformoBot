@@ -44,6 +44,8 @@ export const NodeType = Object.freeze({
     'ExpressionStatement':'ExpressionStatement',
     'UnaryExpression':'UnaryExpression',
     'IfStatement':'IfStatement',
+    'SwitchStatement':'SwitchStatement',
+    'BreakStatement':'BreakStatement',
 })
 
 export function getVariable(rightNode) {
@@ -113,12 +115,14 @@ export function processASTNode(ast) {
                     this.skip();
                     break;
                 // Sequence of expressions.
+                /*
                 case NodeType.SequenceExpression:
                     node.expressions.forEach(expression => {
                         processASTNode(expression);
                     });
                     this.skip();
                     break;
+                */
                 // Variable is updated.
                 case NodeType.UpdateExpression:
                     handleUpdateExpression(node);
@@ -139,6 +143,8 @@ export function processASTNode(ast) {
                     handleIfStatement(node);
                     this.skip();
                     break;
+                case NodeType.BreakStatement:
+                    return;
             }
         },
         leave: function ( node, parent, prop, index ) {

@@ -7,9 +7,7 @@ export function handleDoWhileStatement(doWhileNode) {
     
     increaseScope();
 
-    doWhileNode.body.body.forEach(node => {
-        processASTNode(node);
-    });
+    processASTNode(doWhileNode.body.body);
 
     performLoop(doWhileNode.test, doWhileNode.body.body);
 

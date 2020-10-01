@@ -10,15 +10,11 @@ export function performLoop(testNode, bodyNodes) {
 
     if (variableResult.type === VariableType.unknown) {
         increaseUnknownLoopNumber();
-        bodyNodes.forEach(node => {
-            processASTNode(node);
-        });
+        processASTNode(bodyNodes);
         decreaseUnknownLoopNumber();
     } else {
         while (variableResult.value) {
-            bodyNodes.forEach(node => {
-                processASTNode(node);
-            });
+            processASTNode(bodyNodes);
             variableResult = processSingleASTNode(testNode);
         }
     }

@@ -17,31 +17,23 @@ export function handleIfStatement(ifNode) {
 
         increaseUnknownLoopNumber();
         increaseScope();
-        ifNode.consequent.body.forEach(node => {
-            processASTNode(node);
-        });
+        processASTNode(ifNode.consequent.body);
         decreaseScope();
         decreaseUnknownLoopNumber();
 
         increaseUnknownLoopNumber();
         increaseScope();
-        ifNode.alternate.body.forEach(node => {
-            processASTNode(node);
-        });
+        processASTNode(ifNode.alternate.body);
         decreaseScope();
         decreaseUnknownLoopNumber();
     } else {
         if (variableResult.value) {
             increaseScope();
-            ifNode.consequent.body.forEach(node => {
-                processASTNode(node);
-            });
+            processASTNode(ifNode.consequent.body);
             decreaseScope();
         } else {
             increaseScope();
-            ifNode.alternate.body.forEach(node => {
-                processASTNode(node);
-            });
+            processASTNode(ifNode.alternate.body);
             decreaseScope();
         }
     }
