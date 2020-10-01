@@ -19,12 +19,10 @@ let unknownLoopNumber = [];
 
 export function increaseUnknownLoopNumber() {
     unknownLoopNumber[unknownLoopNumber.length] = variablesMapArray.length;
-    increaseScope();
 }
 
 export function decreaseUnknownLoopNumber() {
     unknownLoopNumber.splice(unknownLoopNumber.length - 1, 1);
-    decreaseScope();
 }
 
 export function increaseScope() {

@@ -14,21 +14,21 @@ export function handleIfStatement(ifNode) {
     let variableResult = processSingleASTNode(ifNode.test);
 
     if (variableResult.type === VariableType.unknown) {
-        increaseUnknownLoopNumber();
 
-        // Do both branches
+        increaseUnknownLoopNumber();
         increaseScope();
         ifNode.consequent.body.forEach(node => {
             processASTNode(node);
         });
         decreaseScope();
+        decreaseUnknownLoopNumber();
 
+        increaseUnknownLoopNumber();
         increaseScope();
         ifNode.alternate.body.forEach(node => {
             processASTNode(node);
         });
         decreaseScope();
-
         decreaseUnknownLoopNumber();
     } else {
         if (variableResult.value) {
