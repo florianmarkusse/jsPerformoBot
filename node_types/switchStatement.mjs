@@ -8,11 +8,16 @@ export function handleSwitchStatement(switchNode) {
 
     increaseScope();
 
+    let caseNodes = [];
+    switchNode.cases.forEach(switchCase => {
+        caseNodes[caseNodes.length] = switchCase;
+    });
+
     // Solve discriminant
     let variableResult = processSingleASTNode(switchNode.discriminant);
 
     if (variableResult.value) {
-        solveDeterminantSwitch(value, switchNode)
+        solveDeterminantSwitch(variableResult.value, switchNode)
     }
 
 
@@ -20,9 +25,20 @@ export function handleSwitchStatement(switchNode) {
 }
 
 function solveDeterminantSwitch(value, switchNode) {
+
+    let caseNodes = [];
+    switchNode.cases.forEach(switchCase => {
+        caseNodes[caseNodes.length] = switchCase;
+    });
+
+
     for (let i = 0; i < switchNode.cases.length; i++) {
-        if (value === processSingleASTNode(switchNode.cases[i].test)) {
-            processASTNode(switchNode.cases[i].consequent);
+        let testResult = processSingleASTNode(switchNode.cases[i].test).value;
+        if (testResult && testResult === value) {
+            processASTNode(caseNodes);
+            break;
+        } else {
+            caseNodes.shift();
         }
     }
 }

@@ -20,6 +20,7 @@ import { solveLogicalExpressionChain } from './LogicalExpression.mjs';
 import { handleBlockStatement } from './blockStatement.mjs';
 import { handleUnaryExpression } from './unaryExpression.mjs';
 import { handleIfStatement } from './ifStatement.mjs';
+import { handleSwitchStatement } from './switchStatement.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
@@ -143,8 +144,14 @@ export function processASTNode(ast) {
                     handleIfStatement(node);
                     this.skip();
                     break;
+                // Break statement.
                 case NodeType.BreakStatement:
                     return;
+                // Switch statement.
+                case NodeType.SwitchStatement:
+                    handleSwitchStatement(node);
+                    this.skip();
+                    break;
             }
         },
         leave: function ( node, parent, prop, index ) {
