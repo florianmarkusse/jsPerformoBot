@@ -17,7 +17,8 @@
     "reverse": "node app.js reverseArrayWrite.js",
     "undefinedRead": "node app.js undefinedRead.js",
     "test": "node app.js test.js",
-    "debug": "node debug.js test.js"
+    "debug": "node debug.js test.js",
+    "batch": "node app.js test_files"
   },
   "author": "",
   "license": "ISC"
