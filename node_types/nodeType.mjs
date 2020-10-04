@@ -21,6 +21,7 @@ import { handleBlockStatement } from './blockStatement.mjs';
 import { handleUnaryExpression } from './unaryExpression.mjs';
 import { handleIfStatement } from './ifStatement.mjs';
 import { handleSwitchStatement } from './switchStatement.mjs';
+import { handleTryStatement } from './tryStatement.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
@@ -47,6 +48,7 @@ export const NodeType = Object.freeze({
     'IfStatement':'IfStatement',
     'SwitchStatement':'SwitchStatement',
     'BreakStatement':'BreakStatement',
+    'TryStatement':'TryStatement',
 })
 
 export function getVariable(rightNode) {
@@ -116,14 +118,12 @@ export function processASTNode(ast) {
                     this.skip();
                     break;
                 // Sequence of expressions.
-                /*
                 case NodeType.SequenceExpression:
                     node.expressions.forEach(expression => {
                         processASTNode(expression);
                     });
                     this.skip();
                     break;
-                */
                 // Variable is updated.
                 case NodeType.UpdateExpression:
                     handleUpdateExpression(node);
@@ -144,12 +144,14 @@ export function processASTNode(ast) {
                     handleIfStatement(node);
                     this.skip();
                     break;
-                // Break statement.
-                case NodeType.BreakStatement:
-                    return;
                 // Switch statement.
                 case NodeType.SwitchStatement:
                     handleSwitchStatement(node);
+                    this.skip();
+                    break;
+                // Try-statement.
+                case NodeType.TryStatement:
+                    handleTryStatement(node);
                     this.skip();
                     break;
             }

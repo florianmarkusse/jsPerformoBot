@@ -1,11 +1,10 @@
-let thing = 1;
-switch (thing) {
-    case 0:
-        thing = 30;
-        break;
-    case 1:
-        thing = 20;
-        break;
-    default:
-        thing = 10;
+let i = 10;
+let j = 30;
+
+try {
+    i += 10;
+} catch (error) {
+    i += 30;
+} finally {
+    j = 40;
 }
