@@ -89,3 +89,24 @@ export function createCorrectNodeBasedOnValue(value) {
         return createLiteralNode(value);
     }
 }
+
+export function createCallExpressionNode() {
+    return {
+        type: NodeType.CallExpression,
+        start: 0,
+        end: 0,
+        callee: null,
+        arguments: [],
+        optional: false
+    }
+}
+
+export function createUnknownVariableDeclaratorNode(name) {
+    return {
+        type: NodeType.VariableDeclarator,
+        start: 0,
+        end: 0,
+        id: createIdentifierNode(name),
+        init: createCallExpressionNode(),
+      }
+}

@@ -22,6 +22,8 @@ import { handleUnaryExpression } from './unaryExpression.mjs';
 import { handleIfStatement } from './ifStatement.mjs';
 import { handleSwitchStatement } from './switchStatement.mjs';
 import { handleTryStatement } from './tryStatement.mjs';
+import { handleImportDeclaration } from './importDeclaration.mjs';
+import { handleFunctionDeclaration } from './handleFunctionDeclaration.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
@@ -49,6 +51,8 @@ export const NodeType = Object.freeze({
     'SwitchStatement':'SwitchStatement',
     'BreakStatement':'BreakStatement',
     'TryStatement':'TryStatement',
+    "ImportDeclaration":"ImportDeclaration",
+    'FunctionDeclaration':'FunctionDeclaration',
 })
 
 export function getVariable(rightNode) {
@@ -88,7 +92,7 @@ export function processASTNode(ast) {
                 // New variable(s) declared.
                 case NodeType.VariableDeclaration:
                     node.declarations.forEach(declaration => {
-                        handleVariableDeclarator(declaration.id.name, declaration.init);
+                        handleVariableDeclarator(declaration);
                     });
                     this.skip();
                     break;
@@ -152,6 +156,16 @@ export function processASTNode(ast) {
                 // Try-statement.
                 case NodeType.TryStatement:
                     handleTryStatement(node);
+                    this.skip();
+                    break;
+                // Module import.
+                case NodeType.ImportDeclaration:
+                    handleImportDeclaration(node);
+                    this.skip();
+                    break;
+                // Function declaration.
+                case NodeType.FunctionDeclaration:
+                    handleFunctionDeclaration(node);
                     this.skip();
                     break;
             }

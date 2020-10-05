@@ -16,7 +16,7 @@ fs.readFile(fileString, function read(err, data) {
 });
 
 function processFile(content) {
-    const ast = espree.parse(content, { tokens: false, ecmaVersion: 11 });
+    const ast = espree.parse(content, { tokens: false, ecmaVersion: 11, sourceType: "module" });
     
     
     walk( ast, {

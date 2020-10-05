@@ -16,8 +16,8 @@
     "binary": "node app.js binaryOperationUndefined.js",
     "reverse": "node app.js reverseArrayWrite.js",
     "undefinedRead": "node app.js undefinedRead.js",
-    "test": "node app.js test.js",
-    "debug": "node debug.js test.js",
+    "test": "node app.js test.mjs",
+    "debug": "node debug.js test.mjs",
     "batch": "node app.js test_files"
   },
   "author": "",

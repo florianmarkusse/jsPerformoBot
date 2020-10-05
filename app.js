@@ -27,7 +27,8 @@ fileStringsToCheck.forEach(fileString => {
             throw err;
         }
     
-        let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 });
+        let sourceType = fileString.includes(".mjs") ? "module" : "script";
+        let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: sourceType});
         
         let previousFix;
         let fixToDo;
