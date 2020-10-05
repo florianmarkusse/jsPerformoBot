@@ -1,6 +1,7 @@
 import fs from 'fs';
 import espree from 'espree';
 import escodegen from 'escodegen';
+import lodash from 'lodash';
 
 
 import { processASTNode } from './node_types/nodeType.mjs';
@@ -18,7 +19,6 @@ if (String(process.argv[2]).includes(".js") || String(process.argv[2]).includes(
     // Batch mode
     let result = getAllFilesRecursively(String(process.argv[2]));
     fileStringsToCheck = getOnlyJSFiles(result);
-    console.log(fileStringsToCheck);
 }
 
 fileStringsToCheck.forEach(fileString => {
@@ -29,9 +29,11 @@ fileStringsToCheck.forEach(fileString => {
     
         let sourceType = fileString.includes(".mjs") ? "module" : "script";
         let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: sourceType});
+        let deepCopyAST = lodash.cloneDeep(ast);
         
         let previousFix;
         let fixToDo;
+        let foundFix = false;
         do {
             processAST(ast);
             let iterator = getFixSet().values();
@@ -45,12 +47,41 @@ fileStringsToCheck.forEach(fileString => {
     
             if (fixToDo !== undefined) {
                 fixToDo.fix(ast);
+                if (!lodash.isEqual(ast, deepCopyAST)) {
+                    foundFix = true;
+                }
                 ast = espree.parse(escodegen.generate(ast), { tokens: false, ecmaVersion: 11 });
                 previousFix = fixToDo;
             }
         } while(fixToDo !== undefined/*false*/);
     
-        console.log(escodegen.generate(ast));
+        if (foundFix) {
+
+            console.log(`Fixed a performance issue in ${fileString}`);
+
+            let splitFile = fileString.split("\\");
+            let buildString = "results\\";
+
+            while (splitFile.length > 0) {
+                if (!splitFile[0].includes(".")) {
+                    if (!fs.existsSync(buildString + splitFile[0])) {
+                        fs.mkdirSync(buildString + splitFile[0]);
+                    }
+                    buildString += splitFile[0] + "\\";
+                } else {
+                    fs.writeFile(buildString + splitFile[0], escodegen.generate(ast), (err) => {
+                        if (err) {
+                            console.log(err); 
+                        }
+                    });
+                }
+                splitFile.shift();
+            }
+            
+        } else {
+            console.log(`Did not find any performance issues in ${fileString}`);
+        }
+
     });
 })
 
@@ -60,11 +91,11 @@ function processAST(ast) {
     clearGlobals();
     processASTNode(ast);
     
-    
+    /*
     getVariables()[0].forEach(element => {
         console.log(element);
     });
-    
+    */
 
     /*
     getFixSet().forEach(fix => {
