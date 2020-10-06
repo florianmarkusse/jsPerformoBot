@@ -4,34 +4,40 @@ const {walk} = pkg;
 import { NodeType } from '../node_types/nodeType.mjs';
 import { solveNamesMemberExpression } from '../node_types/memberExpression.mjs';
 
-export function getNodelastAssignedVariable(ast, name) {
+export function getNodelastAssignedVariable(ast, name, untilNode) {
 
     let lastNode;
+    let doneSearching = false;
+
 
     walk( ast, {
         enter: function ( node, parent, prop, index ) {
-
-            switch (node.type) {
-                case NodeType.VariableDeclaration:
-                for (const declaration of node.declarations) {
-                    if (declaration.id.name === name) {
-                        lastNode = declaration;
+            if (nodeEquals(node, untilNode)) {
+                doneSearching = true;
+            }
+            if (!doneSearching) {
+                switch (node.type) {
+                    case NodeType.VariableDeclaration:
+                    for (const declaration of node.declarations) {
+                        if (declaration.id.name === name) {
+                            lastNode = declaration;
+                        }
                     }
+                    break;
+                case NodeType.AssignmentExpression:
+                    if (node.left.name === name) {
+                        lastNode = node;
+                    }
+                    break;
+                case NodeType.UpdateExpression:
+                    if (node.argument.name === name) {
+                        lastNode = node;
+                    }
+                    break;
+                case NodeType.SequenceExpression:
+                    console.error("sequence expression in init node at astTraversal.mjs not implemented yet");
+                    break;
                 }
-                break;
-            case NodeType.AssignmentExpression:
-                if (node.left.name === name) {
-                    lastNode = node;
-                }
-                break;
-            case NodeType.UpdateExpression:
-                if (node.argument.name === name) {
-                    lastNode = node;
-                }
-                break;
-            case NodeType.SequenceExpression:
-                console.error("sequence expression in init node at astTraversal.mjs not implemented yet");
-                break;
             }
         },
         leave: function ( node, parent, prop, index ) {

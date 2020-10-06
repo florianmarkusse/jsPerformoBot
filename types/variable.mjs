@@ -4,6 +4,7 @@ import { NaNVariable } from './NaNVariable.mjs';
 import { UnknownVariable } from './unknownVariable.mjs';
 import { UndefinedVariable } from './undefinedVariable.mjs';
 import { postUnaryOperation } from '../common/stringEval.mjs';
+import { NotDefinedVariable } from './notDefinedVariable.mjs';
 
 export const VariableType = Object.freeze({
     'unknown': 'unknown',
@@ -12,6 +13,7 @@ export const VariableType = Object.freeze({
     'object': 'object',
     'undefined':'undefined',
     'NaN':'NaN',
+    'notDefined':'notDefined',
 });
 
 let variablesMapArray = [new Map()];
@@ -47,9 +49,10 @@ export function getFromVariables(name, operator) {
         if ((typeof name) === "undefined" || name === "undefined") {
             return new UndefinedVariable();
         }
-        if (isNaN(name) || name === "NaN") {
+        if (name === "NaN") {
             return new NaNVariable();
         }
+        return new NotDefinedVariable();
     }
     return variable;
 }

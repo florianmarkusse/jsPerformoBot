@@ -10,33 +10,19 @@ import { decreaseUnknownLoopNumber } from "../types/variable.mjs";
 
 export function handleIfStatement(ifNode) {
 
-    // Solve test
-    let variableResult = processSingleASTNode(ifNode.test);
-
-    if (variableResult.type === VariableType.unknown) {
-
-        increaseUnknownLoopNumber();
-        increaseScope();
+    increaseUnknownLoopNumber();
+    increaseScope();
+    if (ifNode.consequent) {
         processASTNode(ifNode.consequent.body);
-        decreaseScope();
-        decreaseUnknownLoopNumber();
-
-        increaseUnknownLoopNumber();
-        increaseScope();
-        processASTNode(ifNode.alternate.body);
-        decreaseScope();
-        decreaseUnknownLoopNumber();
-    } else {
-        if (variableResult.value) {
-            increaseScope();
-            processASTNode(ifNode.consequent.body);
-            decreaseScope();
-        } else {
-            increaseScope();
-            processASTNode(ifNode.alternate.body);
-            decreaseScope();
-        }
     }
+    decreaseScope();
+    decreaseUnknownLoopNumber();
 
-    
+    increaseUnknownLoopNumber();
+    increaseScope();
+    if (ifNode.alternate) {
+        processASTNode(ifNode.alternate.body);
+    }
+    decreaseScope();
+    decreaseUnknownLoopNumber();
 }

@@ -23,7 +23,12 @@ import { handleIfStatement } from './ifStatement.mjs';
 import { handleSwitchStatement } from './switchStatement.mjs';
 import { handleTryStatement } from './tryStatement.mjs';
 import { handleImportDeclaration } from './importDeclaration.mjs';
-import { handleFunctionDeclaration } from './handleFunctionDeclaration.mjs';
+import { handleFunctionDeclaration } from './functionDeclaration.mjs';
+import { handleClassDeclaration } from './classDeclaration.mjs';
+import { handleCallExpression } from './callExpression.mjs';
+import { solveConditionalExpression } from './conditionalExpression.mjs';
+import { VariableType } from '../types/variable.mjs';
+import { handleArrayPattern } from './arrayPattern.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
@@ -53,6 +58,13 @@ export const NodeType = Object.freeze({
     'TryStatement':'TryStatement',
     "ImportDeclaration":"ImportDeclaration",
     'FunctionDeclaration':'FunctionDeclaration',
+    'ClassDeclaration':'ClassDeclaration',
+    'ThisExpression':'ThisExpression',
+    'SuperExpression':'SuperExpression',
+    'FunctionExpression':'FunctionExpression',
+    'ArrayPattern':'ArrayPattern',
+    'ObjectPattern':'ObjectPattern',
+    'ArrowFunctionExpression':'ArrowFunctionExpression',
 })
 
 export function getVariable(rightNode) {
@@ -72,7 +84,10 @@ export function getVariable(rightNode) {
             return solveBinaryExpressionChain(rightNode);
         case NodeType.MemberExpression:
             let result = solveMemberExpression(rightNode);
-            return getCopyOrReference(result[0].getWithNode(result[1], rightNode));
+            if (typeof result[0].getWithNode === 'function') {
+                return getCopyOrReference(result[0].getWithNode(result[1], rightNode));
+            }
+            return getCopyOrReference(result[0]);
         case NodeType.ConditionalExpression:
             return solveConditionalExpression(rightNode);
         case NodeType.UpdateExpression:
@@ -80,7 +95,13 @@ export function getVariable(rightNode) {
         case NodeType.UnaryExpression:
             return handleUnaryExpression(rightNode);
         case NodeType.CallExpression:
-            return new UnknownVariable();
+            return handleCallExpression(rightNode);
+        case NodeType.LogicalExpression:
+            return solveLogicalExpressionChain(rightNode);
+        case NodeType.ThisExpression:
+            return getCopyOrReference(getFromVariables("this"));
+        case NodeType.SuperExpression:
+            return getCopyOrReference(getFromVariables("super"));
     }
 }
 
@@ -166,6 +187,31 @@ export function processASTNode(ast) {
                 // Function declaration.
                 case NodeType.FunctionDeclaration:
                     handleFunctionDeclaration(node);
+                    this.skip();
+                    break;
+                // Function expression.
+                case NodeType.FunctionExpression:
+                    handleFunctionDeclaration(node);
+                    this.skip();
+                    break;
+                // Arrow Function expression:
+                case NodeType.ArrowFunctionExpression:
+                    handleFunctionDeclaration(node);
+                    this.skip();
+                    break;
+                // Class declaration.
+                case NodeType.ClassDeclaration:
+                    handleClassDeclaration(node);
+                    this.skip();
+                    break;
+                // Call expression.
+                case NodeType.CallExpression:
+                    handleCallExpression(node);
+                    this.skip();
+                    break;
+                // Array pattern.
+                case NodeType.ArrayPattern:
+                    handleArrayPattern(node);
                     this.skip();
                     break;
             }

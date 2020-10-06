@@ -7,11 +7,12 @@ import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 import { UnknownVariable } from "../types/unknownVariable.mjs";
 import { UndefinedRead } from '../fixes/undefinedRead.mjs';
 import { inUnknownLoop } from './variable.mjs';
+import { getFromVariables } from './variable.mjs';
 
 export class ArrayVariable {
     constructor(elements) {
         this.elements = [];
-        
+        this.isKnown = true;
 
         elements.forEach(element => {
             this.addElement(element);
@@ -41,7 +42,16 @@ export class ArrayVariable {
     }
 
     get(index) {
-        if (this.elements[index] !== undefined) {
+
+        if (!this.isKnown) {
+            return new UnknownVariable();
+        }
+
+        if (typeof index === 'string' || index instanceof String) {
+            index = getFromVariables(index).value;
+        }
+
+        if (!isNaN(index) && this.elements[index]) {
             return this.elements[index];
         } else {
             return new UndefinedVariable();
@@ -49,25 +59,52 @@ export class ArrayVariable {
     }
 
     getWithNode(index, node) {
-        if (this.elements[index] !== undefined) {
-            return this.elements[index];
+
+        if (!this.isKnown) {
+            return new UnknownVariable();
+        }
+
+        let val;
+        if (typeof index === 'string' || index instanceof String) {
+            val = getFromVariables(index).value;
         } else {
-            addToFixSet(new UndefinedRead(node));
-            return new UndefinedVariable();
+            val = index;
+        }
+
+        if (this.elements[val] !== undefined) {
+            return this.elements[val];
+        } else {
+            if (getFromVariables(val).type === VariableType.notDefined) {
+                addToFixSet(new UndefinedRead(node));
+                return new UndefinedVariable();
+            }
+            return new UnknownVariable();
         }
     }
 
     set(index, element, key, name) {
-        if (this.firstWrite(index) && isNaN(key)) {
-            this.setMap.set(index, key);
+
+        if (typeof index === 'string' || index instanceof String) {
+            index = getFromVariables(index).value;
         }
-        if (inUnknownLoop(name)) {
-            this.elements[index] = new UnknownVariable();
-        } else {
-            this.elements[index] = element;
+
+        if (isNaN(index)) {
+            this.isKnown = false;
+            this.value = undefined;
         }
-        this.needsFixing(name);
-        this.setValue();
+
+        if (this.isKnown) {
+            if (this.firstWrite(index) && isNaN(key)) {
+                this.setMap.set(index, key);
+            }
+            if (inUnknownLoop(name)) {
+                this.elements[index] = new UnknownVariable();
+            } else {
+                this.elements[index] = element;
+            }
+            this.needsFixing(name);
+            this.setValue();
+        }
     }
 
     firstWrite(index) {

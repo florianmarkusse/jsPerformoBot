@@ -34,7 +34,8 @@ export class ReverseArrayWrite {
 
             // Check if does more than writing to array.
             let updateNodesSet = new Set(updateNodes);
-            let nonUpdateLoopNodes = new Set([...loopNode.body.body].filter(x => !updateNodesSet.has(x)))
+            let filterResult = loopNode.body.body.filter(x => !updateNodesSet.has(x));
+            let nonUpdateLoopNodes = new Set(filterResult);
 
             let count = 0;
             for (const nonUpdateLoopNode of nonUpdateLoopNodes) {
@@ -59,10 +60,7 @@ export class ReverseArrayWrite {
                 }
                 if (finalUsedNode === undefined) {
                     // Check everything above loop for final use
-                    let copyAST = lodash.cloneDeep(ast);
-                    let ASTUntilLoop = getASTUntil(copyAST, loopNode);
-
-                    finalUsedNode = getNodelastAssignedVariable(ASTUntilLoop, key);   
+                    finalUsedNode = getNodelastAssignedVariable(ast, key, loopNode);  
                 }
 
                 // finalUsedNode -> value[value.length - 1]
@@ -144,6 +142,9 @@ export class ReverseArrayWrite {
     }
 
     checkInit(initNode, indexName) {
+        if (initNode === null) {
+            return;
+        }
         switch (initNode.type) {
             case NodeType.VariableDeclaration:
                 for (const declaration of initNode.declarations) {

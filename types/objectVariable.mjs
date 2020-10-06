@@ -5,6 +5,7 @@ import { addToFixSet } from '../fixes/fix.mjs';
 import { UndefinedRead } from '../fixes/undefinedRead.mjs';
 import { inUnknownLoop } from './variable.mjs';
 import { UnknownVariable } from "../types/unknownVariable.mjs";
+import { getFromVariables } from './variable.mjs';
 
 export class ObjectVariable {
 
@@ -42,8 +43,11 @@ export class ObjectVariable {
         if (this.propertiesMap.has(name)) {
             return this.propertiesMap.get(name);
         } else {
-            addToFixSet(new UndefinedRead(node));
-            return new UndefinedVariable();
+            if (getFromVariables(name).type === VariableType.notDefined) {
+                addToFixSet(new UndefinedRead(node));
+                return new UndefinedVariable();
+            }
+            return new UnknownVariable();
         }
     }
 

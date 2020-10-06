@@ -1,4 +1,5 @@
 import { NodeType } from '../node_types/nodeType.mjs';
+import lodash from 'lodash';
 
 export function createLiteralNode(value) {
     return {
@@ -27,6 +28,17 @@ export function createAssignmentExpressionNode(name, value, op) {
         operator: op,
         left: createIdentifierNode(name),
         right: createLiteralNode(value),
+    };
+}
+
+export function createAssignmentToCallExpression(leftNode) {
+    return {
+        type: NodeType.AssignmentExpression,
+        start: 0,
+        end: 0,
+        operator: "=",
+        left: lodash.cloneDeep(leftNode),
+        right: createCallExpressionNode(),
     };
 }
 

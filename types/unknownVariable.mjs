@@ -8,4 +8,8 @@ export class UnknownVariable {
     getWithNode() {
         return new UnknownVariable();
     }
+
+    get() {
+        return new UnknownVariable();
+    }
 }

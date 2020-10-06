@@ -13,7 +13,7 @@ import { containsInUnfixableSet } from './fixes/fix.mjs';
 
 let fileStringsToCheck = [];
 
-if (String(process.argv[2]).includes(".js") || String(process.argv[2]).includes(".mjs")) { 
+if (String(process.argv[2]).endsWith(".js") || String(process.argv[2]).endsWith(".mjs")) { 
     fileStringsToCheck[0] = './test_files/' + String(process.argv[2]);
 } else {
     // Batch mode
@@ -21,14 +21,19 @@ if (String(process.argv[2]).includes(".js") || String(process.argv[2]).includes(
     fileStringsToCheck = getOnlyJSFiles(result);
 }
 
-fileStringsToCheck.forEach(fileString => {
-    fs.readFile(fileString, function read(err, data) {
+for (let i = 0; i < fileStringsToCheck.length; i++) {
+    const fileString = fileStringsToCheck[i];
+
+
+    console.log(`Reading file ${fileString}`);
+
+    let data = fs.readFileSync(fileString, function read(err, data) {
         if (err) {
             throw err;
         }
-    
-        let sourceType = fileString.includes(".mjs") ? "module" : "script";
-        let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: sourceType});
+    });
+
+    let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
         let deepCopyAST = lodash.cloneDeep(ast);
         
         let previousFix;
@@ -50,40 +55,48 @@ fileStringsToCheck.forEach(fileString => {
                 if (!lodash.isEqual(ast, deepCopyAST)) {
                     foundFix = true;
                 }
-                ast = espree.parse(escodegen.generate(ast), { tokens: false, ecmaVersion: 11 });
+                ast = espree.parse(escodegen.generate(ast), { tokens: false, ecmaVersion: 11 , sourceType: "module"});
                 previousFix = fixToDo;
             }
         } while(fixToDo !== undefined/*false*/);
     
         if (foundFix) {
 
-            console.log(`Fixed a performance issue in ${fileString}`);
+            console.log(`Fixed a performance issue in ${fileString}\n`);
 
-            let splitFile = fileString.split("\\");
-            let buildString = "results\\";
+            let splitFile;
+            let buildString = "";
+
+            if (fileString.includes("/")) {
+                splitFile = fileString.split("/");
+                splitFile.shift();
+                buildString += "results\\"
+            } else {
+                splitFile = fileString.split("\\");
+                buildString += splitFile[0] + "\\results\\";
+                splitFile.shift();
+            }
 
             while (splitFile.length > 0) {
-                if (!splitFile[0].includes(".")) {
-                    if (!fs.existsSync(buildString + splitFile[0])) {
+                if (!fs.existsSync(buildString + splitFile[0])) {
+                    if (splitFile.length > 1) {
                         fs.mkdirSync(buildString + splitFile[0]);
+                    } else {
+                        fs.writeFile(buildString + splitFile[0], escodegen.generate(ast), (err) => {
+                            if (err) {
+                                console.log(err); 
+                            }
+                        });
                     }
-                    buildString += splitFile[0] + "\\";
-                } else {
-                    fs.writeFile(buildString + splitFile[0], escodegen.generate(ast), (err) => {
-                        if (err) {
-                            console.log(err); 
-                        }
-                    });
-                }
+                } 
+                buildString += splitFile[0] + "\\";
                 splitFile.shift();
             }
             
         } else {
             console.log(`Did not find any performance issues in ${fileString}`);
         }
-
-    });
-})
+}
 
 
 function processAST(ast) {
@@ -96,12 +109,13 @@ function processAST(ast) {
         console.log(element);
     });
     */
+    
 
-    /*
+    
     getFixSet().forEach(fix => {
         console.log(fix);
     })
-    */
+    
     
     return ast;
 }
@@ -116,7 +130,7 @@ function getAllFilesRecursively(fileName) {
     let fileNames = fs.readdirSync(fileName);
 
     for (let i = 0; i < fileNames.length; i++) {
-        if (!fileNames[i].includes(".")) {
+        if (fs.lstatSync(fileName + "\\" + fileNames[i]).isDirectory()) {
             fileNames[i] = getAllFilesRecursively(fileName + "\\" + fileNames[i])
             i += fileNames[i].length - 1;
             fileNames = flatten(fileNames);
@@ -149,7 +163,7 @@ function getOnlyJSFiles(files) {
     let jsFiles = [];
 
     files.forEach(file => {
-        if (file.includes(".js") || file.includes(".mjs")) {
+        if (file.endsWith(".js") || file.endsWith(".mjs")) {
             jsFiles.push(file);
         }
     })    

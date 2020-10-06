@@ -3,12 +3,20 @@ import { solveMemberExpression, digUntilBase } from './memberExpression.mjs';
 import { VariableType, getFromVariables, assignVariable } from '../types/variable.mjs';
 import { binaryOperation } from '../common/stringEval.mjs';
 import { LiteralVariable } from "../types/literalVariable.mjs";
+import { handleArrayPattern } from './arrayPattern.mjs';
+import { handleObjectPattern } from './objectPattern.mjs';
 
 
 export function handleAssignmentExpression(assignmentNode) {
     let right = getVariable(assignmentNode.right);
                 
     switch (assignmentNode.left.type) {
+        case NodeType.ArrayPattern:
+            handleArrayPattern(assignmentNode.left, false);
+            break;
+        case NodeType.ObjectPattern:
+            handleObjectPattern(assignmentNode.left, false);
+            break;
         case NodeType.Identifier:
 
             let left = getFromVariables(assignmentNode.left.name);
@@ -20,6 +28,9 @@ export function handleAssignmentExpression(assignmentNode) {
             break;
         case NodeType.MemberExpression:
             let result = solveMemberExpression(assignmentNode.left);
+            if (result[0].type === VariableType.unknown || result[0].type === VariableType.notDefined) {
+                return;
+            }
             let variable = result[0].get(result[1]);
 
             if (variable && variable.type === right.type && variable.type === VariableType.literal && assignmentNode.operator !== "=") {
