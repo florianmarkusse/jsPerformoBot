@@ -7,9 +7,15 @@ export function handleDoWhileStatement(doWhileNode) {
     
     increaseScope();
 
-    processASTNode(doWhileNode.body.body);
+    if (doWhileNode.body.body) {
+        processASTNode(doWhileNode.body.body);
+        performLoop(doWhileNode.test, doWhileNode.body.body);
+    } else {
+        processASTNode(doWhileNode.body);
+        performLoop(doWhileNode.test, doWhileNode.body);
+    }
 
-    performLoop(doWhileNode.test, doWhileNode.body.body);
+    
 
     decreaseScope();
 }

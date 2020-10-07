@@ -16,7 +16,12 @@ export function handleTryStatement(tryNode) {
     if (tryNode.handler !== null) {
         increaseScope();
 
-        let arr = lodash.cloneDeep(tryNode.handler.body.body);
+        let arr;
+        if (tryNode.handler.body.body) {
+            arr = lodash.cloneDeep(tryNode.handler.body.body);
+        } else {
+            arr = [lodash.cloneDeep(tryNode.handler.body)];
+        }
         arr.push(tryNode.handler.param);
         processASTNode(arr);
 

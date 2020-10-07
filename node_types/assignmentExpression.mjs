@@ -5,18 +5,30 @@ import { binaryOperation } from '../common/stringEval.mjs';
 import { LiteralVariable } from "../types/literalVariable.mjs";
 import { handleArrayPattern } from './arrayPattern.mjs';
 import { handleObjectPattern } from './objectPattern.mjs';
+import { getCopyOrReference } from '../types/variable.mjs';
+import { UnknownVariable } from '../types/unknownVariable.mjs';
 
 
 export function handleAssignmentExpression(assignmentNode) {
-    let right = getVariable(assignmentNode.right);
+    let right;
+    if (assignmentNode.right.type === NodeType.AssignmentExpression) {
+        right = handleAssignmentExpression(assignmentNode.right);
+    } else {
+        right = getVariable(assignmentNode.right);
+    }
+
+    if (right === undefined) {
+        console.error(assignmentNode);
+        throw Error();
+    }
                 
     switch (assignmentNode.left.type) {
         case NodeType.ArrayPattern:
             handleArrayPattern(assignmentNode.left, false);
-            break;
+            return new UnknownVariable();
         case NodeType.ObjectPattern:
             handleObjectPattern(assignmentNode.left, false);
-            break;
+            return new UnknownVariable();
         case NodeType.Identifier:
 
             let left = getFromVariables(assignmentNode.left.name);
@@ -25,11 +37,11 @@ export function handleAssignmentExpression(assignmentNode) {
                 right = new LiteralVariable(binaryOperation(left.value, assignmentNode.operator.slice(0, -1), right.value));
             }
             assignVariable(assignmentNode.left.name, right);
-            break;
+            return getCopyOrReference(right);
         case NodeType.MemberExpression:
             let result = solveMemberExpression(assignmentNode.left);
             if (result[0].type === VariableType.unknown || result[0].type === VariableType.notDefined) {
-                return;
+                return getCopyOrReference(right);
             }
             let variable = result[0].get(result[1]);
 
@@ -38,8 +50,7 @@ export function handleAssignmentExpression(assignmentNode) {
             } 
                 
             result[0].set(result[1], right, getNameOrConstant(assignmentNode.left.property), digUntilBase(assignmentNode.left));
-            
-            break;
+            return getCopyOrReference(right);
     }
 }
 

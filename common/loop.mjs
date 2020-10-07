@@ -8,7 +8,7 @@ export function performLoop(testNode, bodyNodes) {
 
     let variableResult = processSingleASTNode(testNode);
 
-    if (variableResult.type === VariableType.unknown) {
+    if (variableResult.type !== VariableType.literal) {
         increaseUnknownLoopNumber();
         processASTNode(bodyNodes);
         decreaseUnknownLoopNumber();

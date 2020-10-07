@@ -5,6 +5,7 @@ import { UnknownVariable } from './unknownVariable.mjs';
 import { UndefinedVariable } from './undefinedVariable.mjs';
 import { postUnaryOperation } from '../common/stringEval.mjs';
 import { NotDefinedVariable } from './notDefinedVariable.mjs';
+import { getVariable } from '../node_types/nodeType.mjs';
 
 export const VariableType = Object.freeze({
     'unknown': 'unknown',
@@ -35,16 +36,9 @@ export function decreaseScope() {
     variablesMapArray.splice(variablesMapArray.length - 1, 1);
 }
 
-export function getFromVariables(name, operator) {
+export function getFromVariables(name) {
 
-    if (operator) {
-        let result = lodash.cloneDeep(getVariable(name));
-        let variable = getVariable(name);
-        variable.value = postUnaryOperation(variable.value, transformIncrementDecrementOperators(operator));
-        return result;
-    }
-
-    let variable = getVariable(name);
+    let variable = getVar(name);
     if (variable === undefined) {
         if ((typeof name) === "undefined" || name === "undefined") {
             return new UndefinedVariable();
@@ -54,10 +48,16 @@ export function getFromVariables(name, operator) {
         }
         return new NotDefinedVariable();
     }
+
+    /*
+    if (findScopeOf(name) < variablesMapArray.length - 1) {
+        return new UnknownVariable();
+    }
+    */
     return variable;
 }
 
-function getVariable(name) {
+function getVar(name) {
     for (let i = variablesMapArray.length - 1; i >= 0; i--) {
         if (variablesMapArray[i].has(name)) {
             return variablesMapArray[i].get(name);
@@ -85,7 +85,11 @@ export function assignVariable(name, variable) {
             variablesMapArray[index].set(name, variable);
         }
     } else {
-        console.error("wanted to assign '" + name + "' to new value but could not find in variables maps");
+        // Weird javascript stuff, apparently it's sometimes possible to set something to a new value
+        // e.g. "Dagoba = {}" without having declared Dagoba first or imported it or whatever...
+        createVariable(name, variable);
+        //console.error("wanted to assign '" + name + "' to new value but could not find in variables maps");
+        //throw Error();
     }
 }
 
@@ -117,6 +121,7 @@ export function getCopyOrReference(variable) {
         case VariableType.undefined:
         case VariableType.unknown:
         case VariableType.NaN:
+        case VariableType.notDefined:
             return lodash.cloneDeep(variable);
         case VariableType.array:
         case VariableType.object:

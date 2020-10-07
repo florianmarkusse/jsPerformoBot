@@ -36,6 +36,7 @@ export function getNodelastAssignedVariable(ast, name, untilNode) {
                     break;
                 case NodeType.SequenceExpression:
                     console.error("sequence expression in init node at astTraversal.mjs not implemented yet");
+                    throw Error();
                     break;
                 }
             }

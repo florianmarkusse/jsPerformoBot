@@ -1,4 +1,5 @@
 import { createUnknownVariableDeclaratorNode } from "../ast_utilities/nodes.mjs";
+import { UnknownVariable } from "../types/unknownVariable.mjs";
 import { decreaseScope } from "../types/variable.mjs";
 import { increaseScope } from "../types/variable.mjs";
 import { processASTNode } from "./nodeType.mjs";
@@ -13,7 +14,13 @@ export function handleFunctionDeclaration(functionNode) {
         handleVariableDeclarator(createUnknownVariableDeclaratorNode(param.name));
     });
 
-    processASTNode(functionNode.body.body);
+    if (functionNode.body.body) {
+        processASTNode(functionNode.body.body);
+    } else {
+        processASTNode(functionNode.body);
+    }
 
     decreaseScope();
+
+    return new UnknownVariable();
 }

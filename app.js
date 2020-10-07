@@ -12,6 +12,7 @@ import { addToUnfixableSet } from './fixes/fix.mjs';
 import { containsInUnfixableSet } from './fixes/fix.mjs';
 
 let fileStringsToCheck = [];
+let filesFixed = [];
 
 if (String(process.argv[2]).endsWith(".js") || String(process.argv[2]).endsWith(".mjs")) { 
     fileStringsToCheck[0] = './test_files/' + String(process.argv[2]);
@@ -33,14 +34,23 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
         }
     });
 
-    let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
-        let deepCopyAST = lodash.cloneDeep(ast);
-        
-        let previousFix;
-        let fixToDo;
-        let foundFix = false;
+    let ast;
+    try {
+        ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
+    } catch (err) {
+        continue;
+    }
+    let deepCopyAST = lodash.cloneDeep(ast);
+    
+    let previousFix;
+    let fixToDo;
+    let foundFix = false;
         do {
+            // The processing happens here
             processAST(ast);
+            //
+
+
             let iterator = getFixSet().values();
             fixToDo = iterator.next().value;
     
@@ -63,6 +73,7 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
         if (foundFix) {
 
             console.log(`Fixed a performance issue in ${fileString}\n`);
+            filesFixed.push(fileString);
 
             let splitFile;
             let buildString = "";
@@ -98,6 +109,11 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
         }
 }
 
+console.log(`Fixed ${filesFixed.length} issues.`);
+console.log(`In the following files:`);
+for (let i = 0; i < filesFixed.length; i++) {
+    console.log(`${filesFixed[i]}`);
+}
 
 function processAST(ast) {
 
@@ -110,7 +126,6 @@ function processAST(ast) {
     });
     */
     
-
     
     getFixSet().forEach(fix => {
         console.log(fix);

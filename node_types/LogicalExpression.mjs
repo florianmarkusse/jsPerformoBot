@@ -4,6 +4,7 @@ import { NodeType, getVariable } from "./nodeType.mjs";
 import { UnknownVariable } from '../types/unknownVariable.mjs';
 import { createCorrectNodeBasedOnValue } from "../ast_utilities/nodes.mjs";
 import { VariableType } from '../types/variable.mjs';
+import { logicalBinaryOperation } from "../common/stringEval.mjs";
 
 
 export function solveLogicalExpressionChain(baseNode) {
@@ -26,7 +27,6 @@ export function solveLogicalExpressionChain(baseNode) {
     if (leftValue.type === VariableType.unknown || rightValue.type === VariableType.unknown) {
         return new UnknownVariable();
     } else {
-        let logicalResult = binaryOperation(leftValue.value, baseNode.operator, rightValue.value);
-        return getVariable(createCorrectNodeBasedOnValue(logicalResult));
+        return logicalBinaryOperation(leftValue, baseNode.operator, rightValue);
     }
 }

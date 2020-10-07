@@ -59,4 +59,10 @@ export class ObjectVariable {
         }
     }
 
+    delete(key) {
+        if (this.propertiesMap.has(key)) {
+            thiis.propertiesMap.delete(key);
+        }
+    }
+
 }

@@ -30,6 +30,8 @@ import { solveConditionalExpression } from './conditionalExpression.mjs';
 import { VariableType } from '../types/variable.mjs';
 import { handleArrayPattern } from './arrayPattern.mjs';
 
+import { TimeOutError } from '../error/timeoutError.mjs';
+
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
     'AssignmentExpression': 'AssignmentExpression',
@@ -65,6 +67,7 @@ export const NodeType = Object.freeze({
     'ArrayPattern':'ArrayPattern',
     'ObjectPattern':'ObjectPattern',
     'ArrowFunctionExpression':'ArrowFunctionExpression',
+    'NewExpression':'NewExpression',
 })
 
 export function getVariable(rightNode) {
@@ -102,123 +105,146 @@ export function getVariable(rightNode) {
             return getCopyOrReference(getFromVariables("this"));
         case NodeType.SuperExpression:
             return getCopyOrReference(getFromVariables("super"));
+        case NodeType.FunctionDeclaration:
+        case NodeType.FunctionExpression:
+        case NodeType.ArrowFunctionExpression:
+            return handleFunctionDeclaration(rightNode);
+        case NodeType.AssignmentExpression:
+            return handleAssignmentExpression(rightNode);
+        case NodeType.NewExpression:
+            return new UnknownVariable();
+        default:
+            console.error("GetVariable with node type not handled");
+            throw Error();
     }
 }
 
 export function processASTNode(ast) {
-    walk( ast, {
-        enter: function ( node, parent, prop, index ) {
-
-            switch(node.type) {
-                // New variable(s) declared.
-                case NodeType.VariableDeclaration:
-                    node.declarations.forEach(declaration => {
-                        handleVariableDeclarator(declaration);
-                    });
-                    this.skip();
-                    break;
-                // New variable declared.
-                case NodeType.VariableDeclarator:
-                    handleVariableDeclarator(node.id.name, node.init);
-                    this.skip();
-                    break;
-                // Variable assigned new value.
-                case NodeType.AssignmentExpression:
-                    handleAssignmentExpression(node);
-                    this.skip();
-                    break;
-                // For statement.
-                case NodeType.ForStatement:
-                    handleForStatement(node);
-                    this.skip();
-                    break;
-                // While statement.
-                case NodeType.WhileStatement:
-                    handleWhileStatement(node);
-                    this.skip();
-                    break;
-                // Do while statement.
-                case NodeType.DoWhileStatement:
-                    handleDoWhileStatement(node);
-                    this.skip();
-                    break;
-                // Sequence of expressions.
-                case NodeType.SequenceExpression:
-                    node.expressions.forEach(expression => {
-                        processASTNode(expression);
-                    });
-                    this.skip();
-                    break;
-                // Variable is updated.
-                case NodeType.UpdateExpression:
-                    handleUpdateExpression(node);
-                    this.skip()
-                    break;
-                // Block statement.
-                case NodeType.BlockStatement:
-                    handleBlockStatement(node);
-                    this.skip();
-                    break;
-                // Unary statement.
-                case NodeType.UnaryExpression:
-                    handleUnaryExpression(node);
-                    this.skip();
-                    break;
-                // If statement.
-                case NodeType.IfStatement:
-                    handleIfStatement(node);
-                    this.skip();
-                    break;
-                // Switch statement.
-                case NodeType.SwitchStatement:
-                    handleSwitchStatement(node);
-                    this.skip();
-                    break;
-                // Try-statement.
-                case NodeType.TryStatement:
-                    handleTryStatement(node);
-                    this.skip();
-                    break;
-                // Module import.
-                case NodeType.ImportDeclaration:
-                    handleImportDeclaration(node);
-                    this.skip();
-                    break;
-                // Function declaration.
-                case NodeType.FunctionDeclaration:
-                    handleFunctionDeclaration(node);
-                    this.skip();
-                    break;
-                // Function expression.
-                case NodeType.FunctionExpression:
-                    handleFunctionDeclaration(node);
-                    this.skip();
-                    break;
-                // Arrow Function expression:
-                case NodeType.ArrowFunctionExpression:
-                    handleFunctionDeclaration(node);
-                    this.skip();
-                    break;
-                // Class declaration.
-                case NodeType.ClassDeclaration:
-                    handleClassDeclaration(node);
-                    this.skip();
-                    break;
-                // Call expression.
-                case NodeType.CallExpression:
-                    handleCallExpression(node);
-                    this.skip();
-                    break;
-                // Array pattern.
-                case NodeType.ArrayPattern:
-                    handleArrayPattern(node);
-                    this.skip();
-                    break;
+    let startDate = new Date();
+    try {
+            walk( ast, {
+                enter: function ( node, parent, prop, index ) {
+                    /*
+                    let currentDate = new Date();
+                    console.log(currentDate - startDate);
+                    */
+                    switch(node.type) {
+                        // New variable(s) declared.
+                        case NodeType.VariableDeclaration:
+                            node.declarations.forEach(declaration => {
+                                handleVariableDeclarator(declaration);
+                            });
+                            this.skip();
+                            break;
+                        // New variable declared.
+                        case NodeType.VariableDeclarator:
+                            handleVariableDeclarator(node.id.name, node.init);
+                            this.skip();
+                            break;
+                        // Variable assigned new value.
+                        case NodeType.AssignmentExpression:
+                            handleAssignmentExpression(node);
+                            this.skip();
+                            break;
+                        // For statement.
+                        case NodeType.ForStatement:
+                            handleForStatement(node);
+                            this.skip();
+                            break;
+                        // While statement.
+                        case NodeType.WhileStatement:
+                            handleWhileStatement(node);
+                            this.skip();
+                            break;
+                        // Do while statement.
+                        case NodeType.DoWhileStatement:
+                            handleDoWhileStatement(node);
+                            this.skip();
+                            break;
+                        // Sequence of expressions.
+                        case NodeType.SequenceExpression:
+                            node.expressions.forEach(expression => {
+                                processASTNode(expression);
+                            });
+                            this.skip();
+                            break;
+                        // Variable is updated.
+                        case NodeType.UpdateExpression:
+                            handleUpdateExpression(node);
+                            this.skip()
+                            break;
+                        // Block statement.
+                        case NodeType.BlockStatement:
+                            handleBlockStatement(node);
+                            this.skip();
+                            break;
+                        // Unary statement.
+                        case NodeType.UnaryExpression:
+                            handleUnaryExpression(node);
+                            this.skip();
+                            break;
+                        // If statement.
+                        case NodeType.IfStatement:
+                            handleIfStatement(node);
+                            this.skip();
+                            break;
+                        // Switch statement.
+                        case NodeType.SwitchStatement:
+                            handleSwitchStatement(node);
+                            this.skip();
+                            break;
+                        // Try-statement.
+                        case NodeType.TryStatement:
+                            handleTryStatement(node);
+                            this.skip();
+                            break;
+                        // Module import.
+                        case NodeType.ImportDeclaration:
+                            handleImportDeclaration(node);
+                            this.skip();
+                            break;
+                        // Function declaration.
+                        case NodeType.FunctionDeclaration:
+                            handleFunctionDeclaration(node);
+                            this.skip();
+                            break;
+                        // Function expression.
+                        case NodeType.FunctionExpression:
+                            handleFunctionDeclaration(node);
+                            this.skip();
+                            break;
+                        // Arrow Function expression:
+                        case NodeType.ArrowFunctionExpression:
+                            handleFunctionDeclaration(node);
+                            this.skip();
+                            break;
+                        // Class declaration.
+                        case NodeType.ClassDeclaration:
+                            handleClassDeclaration(node);
+                            this.skip();
+                            break;
+                        // Call expression.
+                        case NodeType.CallExpression:
+                            handleCallExpression(node);
+                            this.skip();
+                            break;
+                        // Array pattern.
+                        case NodeType.ArrayPattern:
+                            handleArrayPattern(node);
+                            this.skip();
+                            break;
+                    }
+                },
+                leave: function ( node, parent, prop, index ) {
+                }
+            });
+     } catch (err) {
+            if (err instanceof TimeOutError) {
+                console.log("ran out of time");
+            } else {
+                throw err;
             }
-        },
-        leave: function ( node, parent, prop, index ) {
-        }
-    });
+     }
 }
 
 export function processSingleASTNode(node) {
@@ -229,6 +255,7 @@ export function processSingleASTNode(node) {
             return solveBinaryExpressionChain(node);
         case NodeType.Literal:
         case NodeType.Identifier:
+        case NodeType.UpdateExpression:
             return getVariable(node);
 
     }

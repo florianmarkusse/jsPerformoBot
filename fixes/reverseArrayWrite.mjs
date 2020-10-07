@@ -30,11 +30,18 @@ export class ReverseArrayWrite {
             let loopNode = getFirstLoopNodeArrayWrittenTo(ast, this.name, key);
 
             let updateNodes = getUpdateNodesInLoop(loopNode.update, key);
-            updateNodes.push(...getUpdateNodesInLoop(loopNode.body.body, key));
-
+            if (loopNode.body.body) {
+                updateNodes.push(...getUpdateNodesInLoop(loopNode.body.body, key));
+            }
             // Check if does more than writing to array.
             let updateNodesSet = new Set(updateNodes);
-            let filterResult = loopNode.body.body.filter(x => !updateNodesSet.has(x));
+
+            let filterResult;
+            if (loopNode.body.body) {
+                filterResult = loopNode.body.body.filter(x => !updateNodesSet.has(x));
+            } else {
+                filterResult = [];
+            }
             let nonUpdateLoopNodes = new Set(filterResult);
 
             let count = 0;
@@ -56,7 +63,14 @@ export class ReverseArrayWrite {
                 } else {
                     // Add update at final part of loop.
                     let newUpdateNode = createExpressionStatementNode(createUpdateExpressionNode('++', false, key));
-                    loopNode.body.body.push(newUpdateNode);
+                    if (loopNode.body.body) {
+                        loopNode.body.body.push(newUpdateNode);
+                    } else {
+                        console.error("Need to create body.body as an array becuase it only has .body" +
+                                      "now which is not enough for more than 1 statement");
+                        throw Error();
+                    }
+                    
                 }
                 if (finalUsedNode === undefined) {
                     // Check everything above loop for final use
@@ -165,6 +179,7 @@ export class ReverseArrayWrite {
                 break;
             case NodeType.SequenceExpression:
                 console.error("sequence expression in init node at reverseArrayWrite.mjs not implemented yet");
+                throw Error();
                 break;
         }
     }
@@ -181,6 +196,7 @@ export class ReverseArrayWrite {
                 break;
             default:
                 console.error("finalUsedNode is not correct node type in fixFinalUsedNode");
+                throw Error();
         }
     }
 

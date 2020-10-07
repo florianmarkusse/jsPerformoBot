@@ -11,7 +11,12 @@ export function handleForStatement(forNode) {
 
     processASTNode(forNode.init);
 
-    let arr = lodash.cloneDeep(forNode.body.body);
+    let arr;
+    if (forNode.body.body) {
+        arr = lodash.cloneDeep(forNode.body.body);
+    } else {
+        arr = [lodash.cloneDeep(forNode.body)];
+    }
     arr.push(forNode.update);
     performLoop(forNode.test, arr);
 

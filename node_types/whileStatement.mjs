@@ -4,6 +4,10 @@ import { increaseScope } from '../types/variable.mjs';
 
 export function handleWhileStatement(whileNode) {
     increaseScope();
-    performLoop(whileNode.test, whileNode.body.body);
+    if (whileNode.body.body) {
+        performLoop(whileNode.test, whileNode.body.body);
+    } else {
+        performLoop(whileNode.test, whileNode.body);
+    }
     decreaseScope();
 }

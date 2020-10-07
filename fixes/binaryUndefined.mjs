@@ -45,6 +45,7 @@ export class BinaryUndefined {
                         default:
                             console.error("Wanting to change a node due to binary operation with undefined with different operator")
                             console.error(nodeToChange.operator);
+                            throw Error();
                             break;
                     }
                 }
@@ -102,6 +103,7 @@ export class BinaryUndefined {
             default:
                 console.error("Wanting to change a node due to binary operation with undefined with alien parent node type")
                 console.error(parentNode);
+                throw Error();
         }
     }
 

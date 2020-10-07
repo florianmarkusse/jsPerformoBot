@@ -101,7 +101,7 @@ export function solveBinaryExpressionChain(baseNode) {
         }
     }
 
-    if (leftUndefined || rightUndefined) {
+    if ((leftUndefined || rightUndefined) && !baseNode.operator.includes("=")) {
         addToFixSet(new BinaryUndefined(leftUndefined, rightUndefined, baseNode, result));
     }
 

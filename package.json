@@ -18,7 +18,7 @@
     "undefinedRead": "node app.js undefinedRead.js",
     "test": "node app.js test.mjs",
     "debug": "node debug.js test.mjs",
-    "batch": "node app.js D:\\firstTest"
+    "batch": "node app.js D:\\testositories"
   },
   "author": "",
   "license": "ISC"
