@@ -5,6 +5,8 @@ import { UnknownVariable } from '../types/unknownVariable.mjs';
 import { createCorrectNodeBasedOnValue } from "../ast_utilities/nodes.mjs";
 import { VariableType } from '../types/variable.mjs';
 import { logicalBinaryOperation } from "../common/stringEval.mjs";
+import { addToFixSet } from "../fixes/fix.mjs";
+import { BinaryUndefined } from "../fixes/binaryUndefined.mjs";
 
 
 export function solveLogicalExpressionChain(baseNode) {
@@ -23,10 +25,27 @@ export function solveLogicalExpressionChain(baseNode) {
     } else {
         rightValue = getVariable(baseNode.right);
     }
- 
-    if (leftValue.type === VariableType.unknown || rightValue.type === VariableType.unknown) {
-        return new UnknownVariable();
-    } else {
-        return logicalBinaryOperation(leftValue, baseNode.operator, rightValue);
+
+    let result = logicalBinaryOperation(leftValue, baseNode.operator, rightValue);
+
+    switch (baseNode.operator) {
+        case '&&':
+            if (leftValue.type === VariableType.NaN ||
+                leftValue.type === VariableType.undefined ||
+                leftValue.type === VariableType.literal && Boolean(leftValue.value)) {
+                    addToFixSet(new BinaryUndefined(false, true, baseNode, result));
+                }
+            break;
+        case '||':
+            if (leftValue.type === VariableType.NaN ||
+                leftValue.type === VariableType.undefined ||
+                leftValue.type === VariableType.literal && Boolean(leftValue.value)) {
+                    addToFixSet(new BinaryUndefined(true, false, baseNode, result));
+                }
+            break;
     }
+
+    
+ 
+    return result;
 }

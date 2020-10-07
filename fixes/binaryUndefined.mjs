@@ -42,6 +42,14 @@ export class BinaryUndefined {
                         case '&':
                             this.newNode = BinaryResult.zero;
                             break;
+                        case '||':
+                        case '&&':
+                            if (leftUndefined) {
+                                this.newNode = BinaryResult.keepRight;
+                            } else {
+                                this.newNode = BinaryResult.keepLeft;
+                            }
+                            break;
                         default:
                             console.error("Wanting to change a node due to binary operation with undefined with different operator")
                             console.error(nodeToChange.operator);

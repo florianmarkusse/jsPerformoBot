@@ -49,6 +49,7 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
             // The processing happens here
             processAST(ast);
             //
+            console.log("processing");
 
 
             let iterator = getFixSet().values();

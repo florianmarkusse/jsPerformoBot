@@ -108,4 +108,3 @@ export function solveBinaryExpressionChain(baseNode) {
     return result;
 }
 
-

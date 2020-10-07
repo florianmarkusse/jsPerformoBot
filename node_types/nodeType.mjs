@@ -68,6 +68,7 @@ export const NodeType = Object.freeze({
     'ObjectPattern':'ObjectPattern',
     'ArrowFunctionExpression':'ArrowFunctionExpression',
     'NewExpression':'NewExpression',
+    'TemplateLiteral':'TemplateLiteral',
 })
 
 export function getVariable(rightNode) {
@@ -111,6 +112,7 @@ export function getVariable(rightNode) {
             return handleFunctionDeclaration(rightNode);
         case NodeType.AssignmentExpression:
             return handleAssignmentExpression(rightNode);
+        case NodeType.TemplateLiteral:
         case NodeType.NewExpression:
             return new UnknownVariable();
         default:
