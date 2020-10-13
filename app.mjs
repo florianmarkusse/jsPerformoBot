@@ -13,6 +13,7 @@ import { containsInUnfixableSet } from './fixes/fix.mjs';
 
 let fileStringsToCheck = [];
 let filesFixed = [];
+let deepCopyAST;
 
 if (String(process.argv[2]).endsWith(".js") || String(process.argv[2]).endsWith(".mjs")) { 
     fileStringsToCheck[0] = './test_files/' + String(process.argv[2]);
@@ -34,13 +35,8 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
         }
     });
 
-    let ast;
-    try {
-        ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
-    } catch (err) {
-        continue;
-    }
-    let deepCopyAST = lodash.cloneDeep(ast);
+    let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
+    deepCopyAST = lodash.cloneDeep(ast);
     
     let previousFix;
     let fixToDo;
@@ -49,7 +45,6 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
             // The processing happens here
             processAST(ast);
             //
-            console.log("processing");
 
 
             let iterator = getFixSet().values();
@@ -126,11 +121,13 @@ function processAST(ast) {
         console.log(element);
     });
     */
+
     
     
     getFixSet().forEach(fix => {
         console.log(fix);
     })
+    
     
     
     return ast;
@@ -188,4 +185,6 @@ function getOnlyJSFiles(files) {
 }
 
 
-
+export function getBaseAST() {
+    return deepCopyAST;
+}

@@ -61,6 +61,7 @@ export class BinaryUndefined {
             case VariableType.undefined:
                 this.newNode = BinaryResult.undefined;
             case VariableType.unknown:
+            case VariableType.notDefined:
                 if (leftUndefined) {
                     this.newNode = BinaryResult.keepRight;
                 } else {

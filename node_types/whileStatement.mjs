@@ -1,13 +1,20 @@
+import lodash from 'lodash';
+
 import { performLoop } from '../common/loop.mjs';
 import { decreaseScope } from '../types/variable.mjs';
 import { increaseScope } from '../types/variable.mjs';
+import { NodeType } from './nodeType.mjs';
 
 export function handleWhileStatement(whileNode) {
     increaseScope();
-    if (whileNode.body.body) {
-        performLoop(whileNode.test, whileNode.body.body);
+
+    let arr;
+    if (whileNode.body.body && whileNode.body.body.type === NodeType.BlockStatement) {
+        arr = lodash.cloneDeep(whileNode.body.body);
     } else {
-        performLoop(whileNode.test, whileNode.body);
+        arr = [lodash.cloneDeep(whileNode.body)];
     }
+
+    performLoop(whileNode.test, arr);
     decreaseScope();
 }

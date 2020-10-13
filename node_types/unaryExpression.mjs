@@ -15,6 +15,10 @@ export function handleUnaryExpression(unaryNode) {
         return new UnknownVariable();
     }
 
+    if (variable.type === VariableType.unknown) {
+        return new UnknownVariable();
+    }
+
     if (variable.type === VariableType.notDefined) {
         return new NotDefinedVariable();
     }

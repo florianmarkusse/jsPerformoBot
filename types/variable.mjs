@@ -49,11 +49,10 @@ export function getFromVariables(name) {
         return new NotDefinedVariable();
     }
 
-    /*
-    if (findScopeOf(name) < variablesMapArray.length - 1) {
+    if (name !== "this" && name !== "super" && inUnknownLoop(name)) {
         return new UnknownVariable();
     }
-    */
+
     return variable;
 }
 

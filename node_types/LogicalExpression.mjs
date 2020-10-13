@@ -7,6 +7,8 @@ import { VariableType } from '../types/variable.mjs';
 import { logicalBinaryOperation } from "../common/stringEval.mjs";
 import { addToFixSet } from "../fixes/fix.mjs";
 import { BinaryUndefined } from "../fixes/binaryUndefined.mjs";
+import { getParent } from "../ast_utilities/astTraversal.mjs";
+import { getBaseAST } from "../app.mjs";
 
 
 export function solveLogicalExpressionChain(baseNode) {
@@ -28,19 +30,29 @@ export function solveLogicalExpressionChain(baseNode) {
 
     let result = logicalBinaryOperation(leftValue, baseNode.operator, rightValue);
 
+    // ONLY IF NOT IN LOOP
+
+    let parentNode = getOuterLoop(baseNode);
+
+    if (parentNode === undefined ||
+        parentNode.type === NodeType.ForStatement ||
+        parentNode.type === NodeType.WhileStatement ||
+        parentNode.type === NodeType.DoWhileStatement) {
+            return result;
+        }
     switch (baseNode.operator) {
         case '&&':
             if (leftValue.type === VariableType.NaN ||
                 leftValue.type === VariableType.undefined ||
                 leftValue.type === VariableType.literal && Boolean(leftValue.value)) {
-                    addToFixSet(new BinaryUndefined(false, true, baseNode, result));
+                    addToFixSet(new BinaryUndefined(true, false, baseNode, result));
                 }
             break;
         case '||':
             if (leftValue.type === VariableType.NaN ||
                 leftValue.type === VariableType.undefined ||
                 leftValue.type === VariableType.literal && Boolean(leftValue.value)) {
-                    addToFixSet(new BinaryUndefined(true, false, baseNode, result));
+                    addToFixSet(new BinaryUndefined(false, true, baseNode, result));
                 }
             break;
     }
@@ -48,4 +60,17 @@ export function solveLogicalExpressionChain(baseNode) {
     
  
     return result;
+}
+
+function getOuterLoop(node) {
+    if (node && (
+        node.type !== NodeType.ForStatement &&
+        node.type !== NodeType.WhileStatement &&
+        node.type !== NodeType.DoWhileStatement &&
+        node.type !== NodeType.Program)
+     ) {
+            return getOuterLoop(getParent(getBaseAST(), node))
+        } else {
+            return node;
+        }
 }

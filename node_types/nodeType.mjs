@@ -69,6 +69,7 @@ export const NodeType = Object.freeze({
     'ArrowFunctionExpression':'ArrowFunctionExpression',
     'NewExpression':'NewExpression',
     'TemplateLiteral':'TemplateLiteral',
+    'Program':'Program',
 })
 
 export function getVariable(rightNode) {
@@ -122,8 +123,6 @@ export function getVariable(rightNode) {
 }
 
 export function processASTNode(ast) {
-    let startDate = new Date();
-    try {
             walk( ast, {
                 enter: function ( node, parent, prop, index ) {
                     /*
@@ -240,13 +239,6 @@ export function processASTNode(ast) {
                 leave: function ( node, parent, prop, index ) {
                 }
             });
-     } catch (err) {
-            if (err instanceof TimeOutError) {
-                console.log("ran out of time");
-            } else {
-                throw err;
-            }
-     }
 }
 
 export function processSingleASTNode(node) {
@@ -259,7 +251,18 @@ export function processSingleASTNode(node) {
         case NodeType.Identifier:
         case NodeType.UpdateExpression:
             return getVariable(node);
-
+        case NodeType.AssignmentExpression:
+            return handleAssignmentExpression(node);
+        case NodeType.MemberExpression:
+            let result = solveMemberExpression(node);
+            if (typeof result[0].get === 'function') {
+                return getCopyOrReference(result[0].get(result[1]));
+            }
+            return getCopyOrReference(result[0]);
+        default:
+            console.error("process SIngle AST node unknown node type")
+            console.error(node);
+            throw Error();
     }
 }
 

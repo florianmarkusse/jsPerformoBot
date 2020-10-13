@@ -74,7 +74,7 @@ export class ArrayVariable {
         if (this.elements[val] !== undefined) {
             return this.elements[val];
         } else {
-            if (getFromVariables(val).type === VariableType.notDefined) {
+            if (getFromVariables(val).type === VariableType.undefined && !isNaN(index)) {
                 addToFixSet(new UndefinedRead(node));
                 return new UndefinedVariable();
             }

@@ -13,12 +13,13 @@
   },
   "devDependencies": {},
   "scripts": {
-    "binary": "node app.js binaryOperationUndefined.js",
-    "reverse": "node app.js reverseArrayWrite.js",
-    "undefinedRead": "node app.js undefinedRead.js",
-    "test": "node app.js test.mjs",
+    "binary": "node app.mjs binaryOperationUndefined.js",
+    "reverse": "node app.mjs reverseArrayWrite.js",
+    "undefinedRead": "node app.mjs undefinedRead.js",
+    "test": "node app.mjs test.mjs",
+    "bla": "node app.mjs bla.mjs",
     "debug": "node debug.js test.mjs",
-    "batch": "node app.js D:\\testositories"
+    "batch": "node app.mjs D:\\testositories"
   },
   "author": "",
   "license": "ISC"

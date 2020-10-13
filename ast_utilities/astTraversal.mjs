@@ -249,6 +249,8 @@ export function nodeUsesIdentifier(node, name) {
 function nodeEquals(leftNode, rightNode) {
     return  leftNode.start !== undefined && leftNode.end !== undefined && 
             rightNode.start !== undefined && rightNode.end !== undefined &&
-            leftNode.start === rightNode.start && leftNode.end === rightNode.end
+            leftNode.type !== undefined && rightNode.type !== undefined &&
+            leftNode.start === rightNode.start && leftNode.end === rightNode.end &&
+            leftNode.type === rightNode.type
             ;
 }

@@ -14,19 +14,17 @@ export function solveMemberExpression(memberNode) {
         switch (baseVariable[0].type) {
             case VariableType.notDefined:
                 return [new NotDefinedVariable(), propertyVariable];
-            case VariableType.unknown:
-                return [new UnknownVariable(), propertyVariable];
             case VariableType.object:
             case VariableType.array:
                 return [baseVariable[0].get(baseVariable[1]), propertyVariable];
+            default:
+                return [new UnknownVariable(), propertyVariable];
         }
     } else {
 
         let name;
 
         switch (memberNode.object.type) {
-            case NodeType.CallExpression:
-                return [new UnknownVariable(), getPropertyVariable(memberNode.property)];
             case NodeType.ThisExpression:
                 name = "this";
                 break;
@@ -36,6 +34,8 @@ export function solveMemberExpression(memberNode) {
             case NodeType.Identifier:
                 name = memberNode.object.name;
                 break;
+            default:
+                return [new UnknownVariable(), getPropertyVariable(memberNode.property)];
         }
         let objectVariable = getFromVariables(name);
 

@@ -43,10 +43,6 @@ export class ObjectVariable {
         if (this.propertiesMap.has(name)) {
             return this.propertiesMap.get(name);
         } else {
-            if (getFromVariables(name).type === VariableType.notDefined) {
-                addToFixSet(new UndefinedRead(node));
-                return new UndefinedVariable();
-            }
             return new UnknownVariable();
         }
     }

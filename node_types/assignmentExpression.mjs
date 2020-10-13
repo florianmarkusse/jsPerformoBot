@@ -40,9 +40,12 @@ export function handleAssignmentExpression(assignmentNode) {
             return getCopyOrReference(right);
         case NodeType.MemberExpression:
             let result = solveMemberExpression(assignmentNode.left);
-            if (result[0].type === VariableType.unknown || result[0].type === VariableType.notDefined) {
+            if (result[0].type === VariableType.unknown || 
+                result[0].type === VariableType.notDefined ||
+                result[0].type === VariableType.undefined) {
                 return getCopyOrReference(right);
             }
+
             let variable = result[0].get(result[1]);
 
             if (variable && variable.type === right.type && variable.type === VariableType.literal && assignmentNode.operator !== "=") {

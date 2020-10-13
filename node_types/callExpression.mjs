@@ -12,7 +12,7 @@ export function handleCallExpression(callNode) {
 
     if (callNode.arguments) {
         callNode.arguments.forEach(argument => {
-            if (argument.tpye === NodeType.Identifier) {
+            if (argument.type === NodeType.Identifier) {
                 if (getFromVariables(argument.name).type === VariableType.notDefined) {
                     handleVariableDeclarator(createUnknownVariableDeclaratorNode(argument.name));
                 } else {

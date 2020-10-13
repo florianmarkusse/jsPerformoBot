@@ -5,4 +5,12 @@ export class UndefinedVariable {
         this.type = VariableType.undefined;
         this.value = undefined;
     }
+
+    get() {
+        return new UndefinedVariable();
+    }
+
+    getWithNode() {
+        return new UndefinedVariable();
+    }
 }

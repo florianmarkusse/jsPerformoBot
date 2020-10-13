@@ -10,6 +10,7 @@ import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 import { addToFixSet } from '../fixes/fix.mjs';
 import { BinaryUndefined } from '../fixes/binaryUndefined.mjs';
 import { binaryOperation } from '../common/stringEval.mjs';
+import { NotDefinedVariable } from '../types/notDefinedVariable.mjs';
 
 export function solveBinaryExpressionChain(baseNode) {
 
@@ -30,11 +31,15 @@ export function solveBinaryExpressionChain(baseNode) {
     let stringify = false;
     let toNaN = false;
     let toUnknown = false;
+    let toNotDefined = false;
 
     let leftUndefined = false;
     let rightUndefined = false;
 
     switch (leftValue.type) {
+        case VariableType.notDefined:
+            toNotDefined = true;
+            break;
         case VariableType.undefined:
             leftUndefined = true;
             break;
@@ -57,6 +62,9 @@ export function solveBinaryExpressionChain(baseNode) {
     }
 
     switch (rightValue.type) {
+        case VariableType.notDefined:
+            toNotDefined = true;
+            break;
         case VariableType.undefined:
             rightUndefined = true;
             break;
@@ -80,7 +88,10 @@ export function solveBinaryExpressionChain(baseNode) {
 
     let result;
 
-    if (toUnknown) {
+    if (toNotDefined) {
+        result = new NotDefinedVariable();
+    }
+    else if (toUnknown) {
         result = new UnknownVariable();
     }
     else if (stringify) {
