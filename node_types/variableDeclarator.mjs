@@ -19,6 +19,9 @@ export function handleVariableDeclarator(declaratorNode) {
             if (declaratorNode.id.name) {
                 createVariable(declaratorNode.id.name, variable);
             } else {
+                if (declaratorNode.id.properties === undefined) {
+                    console.log("in here");
+                }
                 declaratorNode.id.properties.forEach(property => {
                     createVariable(property.key.name, variable);
                 });

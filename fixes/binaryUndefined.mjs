@@ -11,6 +11,7 @@ const BinaryResult = Object.freeze({
     'zero': 'zero',
     'toString':'toString',
     'undefined':'undefined',
+    'false':'false'
 });
 
 export class BinaryUndefined {
@@ -42,6 +43,8 @@ export class BinaryUndefined {
                         case '&':
                             this.newNode = BinaryResult.zero;
                             break;
+                        case '>':
+                            this.newNode = BinaryResult.false;
                         case '||':
                         case '&&':
                             if (leftUndefined) {
@@ -94,6 +97,8 @@ export class BinaryUndefined {
             case BinaryResult.undefined:
                 parentNode[keyToChange] = createIdentifierNode(undefined);
                 break;
+            case BinaryResult.false:
+                parentNode[keyToChange] = createLiteralNode(false);
         }
     }
 
@@ -104,11 +109,14 @@ export class BinaryUndefined {
             case NodeType.AssignmentExpression:
                 return "right";
             case NodeType.BinaryExpression:
+            case NodeType.LogicalExpression:
                 if (parentNode.left === this.nodeToChange) {
                     return "left";
                 } else {
                     return "right";
                 }
+            case NodeType.UnaryExpression:
+                return "argument";
             default:
                 console.error("Wanting to change a node due to binary operation with undefined with alien parent node type")
                 console.error(parentNode);

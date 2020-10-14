@@ -1,3 +1,4 @@
+import { UnknownVariable } from "../types/unknownVariable.mjs";
 import { VariableType } from "../types/variable.mjs";
 
 export function postUnaryOperation(value, operator) {
@@ -9,7 +10,11 @@ export function postUnaryOperation(value, operator) {
 export function preUnaryOperation(operator, value) {
     let string = typeof value !== 'string' ? String(value) : '"' + value + '"';
     let evalString = operator + fixEscapeCharacters(string);
-    return eval(evalString);
+    try {
+        return eval(evalString)
+    } catch (err) {
+        return "joghdfgdfbgkldfndfgfdgjdfpg";
+    }
 }
 
 export function binaryOperation(leftValue, operator, rightValue) {
@@ -18,10 +23,17 @@ export function binaryOperation(leftValue, operator, rightValue) {
 
     let evalString = fixEscapeCharacters(leftString) + operator + fixEscapeCharacters(rightString);
 
-    return eval(evalString);
+    try {
+        return eval(evalString)
+    } catch (err) {
+        return "joghdfgdfbgkldfndfgfdgjdfpg";
+    }
 }
 
 export function logicalBinaryOperation(leftValue, operator, rightValue) {
+    if (leftValue.type === VariableType.unknown || leftValue.type === VariableType.notDefined) {
+        return new UnknownVariable();
+    }
     switch (operator) {
         case "&&":
             if (leftValue.type === VariableType.NaN || leftValue.type === VariableType.undefined ||

@@ -31,6 +31,7 @@ import { VariableType } from '../types/variable.mjs';
 import { handleArrayPattern } from './arrayPattern.mjs';
 
 import { TimeOutError } from '../error/timeoutError.mjs';
+import { handleForInStatement } from './forInStatement.mjs';
 
 export const NodeType = Object.freeze({
     'ArrayExpression': 'ArrayExpression',
@@ -70,6 +71,17 @@ export const NodeType = Object.freeze({
     'NewExpression':'NewExpression',
     'TemplateLiteral':'TemplateLiteral',
     'Program':'Program',
+    'ForInStatement':'ForInStatement',
+    'ForOfStatement':'ForOfStatement',
+    'SpreadElement':'SpreadElement',
+    'AwaitExpression':'AwaitExpression',
+    'ClassExpression':'ClassExpression',
+    'TaggedTemplateExpression':'TaggedTemplateExpression',
+    'MethodDefinition':'MethodDefinition',
+    'YieldExpression':'YieldExpression',
+    'ChainExpression':'ChainExpression',
+    'ImportExpression':'ImportExpression',
+    'MetaProperty':'MetaProperty',
 })
 
 export function getVariable(rightNode) {
@@ -113,11 +125,27 @@ export function getVariable(rightNode) {
             return handleFunctionDeclaration(rightNode);
         case NodeType.AssignmentExpression:
             return handleAssignmentExpression(rightNode);
+        case NodeType.SequenceExpression:
+            rightNode.expressions.forEach(expression => {
+                processASTNode(expression);
+            });
+            return new UnknownVariable();
+        case NodeType.ClassExpression:
+        case NodeType.TaggedTemplateExpression:
+        case NodeType.YieldExpression:
+            processASTNode(rightNode);
+            return new UnknownVariable();
         case NodeType.TemplateLiteral:
         case NodeType.NewExpression:
+        case NodeType.SpreadElement:
+        case NodeType.AwaitExpression:
+        case NodeType.ChainExpression:
+        case NodeType.ImportExpression:
+        case NodeType.MetaProperty:
             return new UnknownVariable();
         default:
             console.error("GetVariable with node type not handled");
+            console.log(rightNode);
             throw Error();
     }
 }
@@ -150,6 +178,12 @@ export function processASTNode(ast) {
                         // For statement.
                         case NodeType.ForStatement:
                             handleForStatement(node);
+                            this.skip();
+                            break;
+                        // For in/of statement.
+                        case NodeType.ForInStatement:
+                        case NodeType.ForOfStatement:
+                            handleForInStatement(node);
                             this.skip();
                             break;
                         // While statement.
@@ -242,6 +276,11 @@ export function processASTNode(ast) {
 }
 
 export function processSingleASTNode(node) {
+
+    if (node === null) {
+        return new UnknownVariable();
+    }
+
     switch(node.type) {
         case NodeType.LogicalExpression:
             return solveLogicalExpressionChain(node);
@@ -253,6 +292,15 @@ export function processSingleASTNode(node) {
             return getVariable(node);
         case NodeType.AssignmentExpression:
             return handleAssignmentExpression(node);
+        case NodeType.UnaryExpression:
+            return handleUnaryExpression(node);
+        case NodeType.CallExpression:
+            return handleCallExpression(node);
+        case NodeType.SequenceExpression:
+            node.expressions.forEach(expression => {
+                processASTNode(expression);
+            });
+            return new UnknownVariable();
         case NodeType.MemberExpression:
             let result = solveMemberExpression(node);
             if (typeof result[0].get === 'function') {

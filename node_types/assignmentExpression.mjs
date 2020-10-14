@@ -46,6 +46,10 @@ export function handleAssignmentExpression(assignmentNode) {
                 return getCopyOrReference(right);
             }
 
+            if (typeof result[0].get !== "function") {
+                assignVariable(assignmentNode.left.object.name, new UnknownVariable());
+                return new UnknownVariable();
+            }
             let variable = result[0].get(result[1]);
 
             if (variable && variable.type === right.type && variable.type === VariableType.literal && assignmentNode.operator !== "=") {

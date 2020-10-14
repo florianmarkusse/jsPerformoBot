@@ -4,7 +4,7 @@ import { performLoop } from '../common/loop.mjs';
 import { decreaseScope } from '../types/variable.mjs';
 import { increaseScope } from '../types/variable.mjs';
 import { NodeType } from './nodeType.mjs';
-import { processASTNode, processSingleASTNode } from './nodeType.mjs';
+import { processASTNode } from './nodeType.mjs';
 
 export function handleForStatement(forNode) {
 
@@ -14,7 +14,7 @@ export function handleForStatement(forNode) {
 
     let arr;
 
-    if (forNode.body.body && forNode.body.body.type === NodeType.BlockStatement) {
+    if (forNode.body.body && forNode.body.type === NodeType.BlockStatement) {
         arr = lodash.cloneDeep(forNode.body.body);
     } else {
         arr = [lodash.cloneDeep(forNode.body)];

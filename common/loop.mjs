@@ -6,16 +6,9 @@ import { VariableType } from '../types/variable.mjs';
 
 export function performLoop(testNode, bodyNodes) {
 
-    let variableResult = processSingleASTNode(testNode);
+    processASTNode(testNode);
 
-    if (variableResult.type !== VariableType.literal) {
-        increaseUnknownLoopNumber();
-        processASTNode(bodyNodes);
-        decreaseUnknownLoopNumber();
-    } else {
-        while (variableResult.value) {
-            processASTNode(bodyNodes);
-            variableResult = processSingleASTNode(testNode);
-        }
-    }
+    increaseUnknownLoopNumber();
+    processASTNode(bodyNodes);
+    decreaseUnknownLoopNumber();
 }

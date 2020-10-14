@@ -21,12 +21,18 @@ if (String(process.argv[2]).endsWith(".js") || String(process.argv[2]).endsWith(
     // Batch mode
     let result = getAllFilesRecursively(String(process.argv[2]));
     fileStringsToCheck = getOnlyJSFiles(result);
+    if (process.argv[3]) {
+        fileStringsToCheck.splice(0, fileStringsToCheck.indexOf(process.argv[3]));
+    }
 }
 
 for (let i = 0; i < fileStringsToCheck.length; i++) {
     const fileString = fileStringsToCheck[i];
 
 
+    if (fileString.includes('.min')) {
+        continue;
+    }
     console.log(`Reading file ${fileString}`);
 
     let data = fs.readFileSync(fileString, function read(err, data) {
@@ -35,7 +41,12 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
         }
     });
 
-    let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
+    let ast;
+    try {
+        ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
+    } catch(err) {
+        continue;
+    }
     deepCopyAST = lodash.cloneDeep(ast);
     
     let previousFix;
@@ -116,16 +127,20 @@ function processAST(ast) {
     clearGlobals();
     processASTNode(ast);
     
+    
     /*
     getVariables()[0].forEach(element => {
         console.log(element);
     });
     */
+    
+    
 
     
     
     getFixSet().forEach(fix => {
         console.log(fix);
+        console.log(fix.nodeToChange);
     })
     
     

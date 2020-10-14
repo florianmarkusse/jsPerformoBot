@@ -50,6 +50,7 @@ export function getFromVariables(name) {
     }
 
     if (name !== "this" && name !== "super" && inUnknownLoop(name)) {
+        assignVariable(name, new UnknownVariable());
         return new UnknownVariable();
     }
 

@@ -26,7 +26,11 @@ export function handleUnaryExpression(unaryNode) {
     
 
     if (variable.type === VariableType.literal && !isNaN(variable.value)) {
-        return new LiteralVariable(preUnaryOperation(unaryNode.operator, variable.value));
+        let result = preUnaryOperation(unaryNode.operator, variable.value);
+        if (result === "joghdfgdfbgkldfndfgfdgjdfpg") {
+            return new UnknownVariable();
+        }
+        return new LiteralVariable(result);
     } else {
         return new NaNVariable();
     }

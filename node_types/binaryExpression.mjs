@@ -103,7 +103,10 @@ export function solveBinaryExpressionChain(baseNode) {
     else {
         let evalResult = binaryOperation(leftValue.value, baseNode.operator, rightValue.value);
 
-        if (isNaN(evalResult)) {
+        if (evalResult === "joghdfgdfbgkldfndfgfdgjdfpg") {
+            result = new UnknownVariable();
+        }
+        else if (isNaN(evalResult)) {
             result = new NaNVariable();
         } else if (evalResult === undefined) {
             result = new UndefinedVariable();

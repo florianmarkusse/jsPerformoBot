@@ -1,11 +1,9 @@
+import { UnknownVariable } from '../types/unknownVariable.mjs';
+import { processASTNode } from './nodeType.mjs';
 import { getVariable } from './nodeType.mjs';
 
 export function solveConditionalExpression(conditionNode) {
-    let testResult = Boolean(getVariable(conditionNode.test).value);
+    processASTNode(conditionNode.test);
 
-    if (testResult) {
-        return getVariable(conditionNode.consequent);
-    } else {
-        return getVariable(conditionNode.alternate);
-    }
+    return new UnknownVariable();
 }
