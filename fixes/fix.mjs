@@ -14,7 +14,7 @@ export function getFixSet() {
 }
 
 export function clearFixSet() {
-    fixSet.clear();
+    fixSet = new Set();
 }
 
 export function addToUnfixableSet(element) {

@@ -28,6 +28,17 @@ if (String(process.argv[2]).endsWith(".js") || String(process.argv[2]).endsWith(
 
 for (let i = 0; i < fileStringsToCheck.length; i++) {
     const fileString = fileStringsToCheck[i];
+    let newFilePath = "D:\\incorrectFiles2\\";
+    let filename = fileString.replace("D:\\testositories2\\", '')
+
+
+    let finalDot = filename.indexOf(".", 10);
+    let firstPart = filename.substring(0, finalDot)
+    let secondPart = filename.substring(finalDot);
+
+    firstPart += "_FIXED";
+    let fixedFileString = newFilePath + firstPart + secondPart;
+    let newFileString = newFilePath + fileString.replace("D:\\testositories2\\", '');
 
 
     if (fileString.includes('.min')) {
@@ -40,6 +51,7 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
             throw err;
         }
     });
+    
 
     let ast;
     try {
@@ -78,39 +90,28 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
         } while(fixToDo !== undefined/*false*/);
     
         if (foundFix) {
-
             console.log(`Fixed a performance issue in ${fileString}\n`);
             filesFixed.push(fileString);
 
-            let splitFile;
-            let buildString = "";
-
-            if (fileString.includes("/")) {
-                splitFile = fileString.split("/");
-                splitFile.shift();
-                buildString += "results\\"
-            } else {
-                splitFile = fileString.split("\\");
-                buildString += splitFile[0] + "\\results\\";
-                splitFile.shift();
+            let split = fileString.replace("D:\\testositories2\\", '').split("\\");
+            let pathBuilder = "D:\\incorrectFiles2";
+            for (let i = 0; i < split.length - 1; i++) {
+                pathBuilder += "\\" + split[i];
+                if (!fs.existsSync(pathBuilder)) {
+                    fs.mkdirSync(pathBuilder);
+                }
             }
 
-            while (splitFile.length > 0) {
-                if (!fs.existsSync(buildString + splitFile[0])) {
-                    if (splitFile.length > 1) {
-                        fs.mkdirSync(buildString + splitFile[0]);
-                    } else {
-                        fs.writeFile(buildString + splitFile[0], escodegen.generate(ast), (err) => {
-                            if (err) {
-                                console.log(err); 
-                            }
-                        });
-                    }
-                } 
-                buildString += splitFile[0] + "\\";
-                splitFile.shift();
-            }
-            
+            fs.writeFileSync(newFileString, data, (err) => {
+                if (err) {
+                    console.log(err); 
+                }
+            });
+            fs.writeFileSync(fixedFileString, escodegen.generate(ast), (err) => {
+                if (err) {
+                    console.log(err); 
+                }
+            });
         } else {
             console.log(`Did not find any performance issues in ${fileString}`);
         }

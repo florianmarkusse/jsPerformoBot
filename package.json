@@ -19,7 +19,7 @@
     "test": "node app.mjs test.mjs",
     "bla": "node app.mjs bla.mjs",
     "debug": "node debug.js test.mjs",
-    "batch": "node app.mjs D:\\testositories"
+    "batch": "node app.mjs D:\\testositories2"
   },
   "author": "",
   "license": "ISC"

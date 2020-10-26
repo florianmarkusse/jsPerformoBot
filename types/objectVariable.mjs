@@ -26,7 +26,7 @@ let reservedKeyWords = [
 
 export class ObjectVariable {
 
-    constructor(properties) {
+    constructor(properties, isThis) {
         this.type = VariableType.object;
         this.value = {};
         this.propertiesMap = new Map();
@@ -35,6 +35,10 @@ export class ObjectVariable {
         properties.forEach(property => {
             this.addProperty(property);
         });
+
+        if (isThis) {
+            this.propertiesMap.set("constructor", new UnknownVariable());
+        }
 
     }
 
@@ -69,6 +73,7 @@ export class ObjectVariable {
             let constructorOrProgram = getOuterLoop(node);
             if (getFromVariables(name).type === VariableType.notDefined && 
                 !reservedKeyWords.includes(name) && this.known &&
+                constructorOrProgram &&
                 constructorOrProgram.type === NodeType.MethodDefinition &&
                 constructorOrProgram.kind === "constructor") {
                 addToFixSet(new UndefinedRead(node));

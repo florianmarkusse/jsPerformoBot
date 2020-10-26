@@ -53,6 +53,13 @@ export class BinaryUndefined {
                                 this.newNode = BinaryResult.keepLeft;
                             }
                             break;
+                        case '<<':
+                            if (leftUndefined) {
+                                this.newNode = BinaryResult.zero;
+                            } else {
+                                this.newNode = BinaryResult.keepLeft;
+                            }
+                            break;
                         default:
                             console.error("Wanting to change a node due to binary operation with undefined with different operator")
                             console.error(nodeToChange.operator);
@@ -117,6 +124,8 @@ export class BinaryUndefined {
                 }
             case NodeType.UnaryExpression:
                 return "argument";
+            case NodeType.Property:
+                return "value";
             default:
                 console.error("Wanting to change a node due to binary operation with undefined with alien parent node type")
                 console.error(parentNode);

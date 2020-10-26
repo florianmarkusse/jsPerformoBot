@@ -7,13 +7,14 @@ import { NotDefinedVariable } from "../types/notDefinedVariable.mjs";
 import { UnknownVariable } from "../types/unknownVariable.mjs";
 
 export function handleUnaryExpression(unaryNode) {
-    let variable = getVariable(unaryNode.argument);
 
     if (unaryNode.operator === "delete" ||
     unaryNode.operator === "void" ||
     unaryNode.operator === "typeof") {
         return new UnknownVariable();
     }
+
+    let variable = getVariable(unaryNode.argument);
 
     if (variable.type === VariableType.unknown) {
         return new UnknownVariable();
@@ -23,9 +24,15 @@ export function handleUnaryExpression(unaryNode) {
         return new NotDefinedVariable();
     }
 
+    let nanCheck;
+    try {
+        nanCheck = !isNaN(variable.value)
+    } catch (err) {
+        return new UnknownVariable();
+    }
     
 
-    if (variable.type === VariableType.literal && !isNaN(variable.value)) {
+    if (variable.type === VariableType.literal && nanCheck) {
         let result = preUnaryOperation(unaryNode.operator, variable.value);
         if (result === "joghdfgdfbgkldfndfgfdgjdfpg") {
             return new UnknownVariable();

@@ -11,7 +11,7 @@ export function handleClassDeclaration(classNode) {
     if (classNode.superClass !== null) {
         createVariable("super", new ObjectVariable([]));
     }
-    createVariable("this", new ObjectVariable([]));
+    createVariable("this", new ObjectVariable([], true));
 
     processASTNode(classNode.body);
 

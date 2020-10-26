@@ -82,6 +82,7 @@ export const NodeType = Object.freeze({
     'ChainExpression':'ChainExpression',
     'ImportExpression':'ImportExpression',
     'MetaProperty':'MetaProperty',
+    'Property':'Property',
 })
 
 export function getVariable(rightNode) {
