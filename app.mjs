@@ -101,17 +101,25 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
                     fs.mkdirSync(pathBuilder);
                 }
             }
-
+            /*
             fs.writeFileSync(newFileString, data, (err) => {
                 if (err) {
                     console.log(err); 
                 }
             });
+
             fs.writeFileSync(fixedFileString, escodegen.generate(ast), (err) => {
                 if (err) {
                     console.log(err); 
                 }
             });
+            */
+
+           fs.writeFileSync(".\\results\\test_fixed.mjs", escodegen.generate(ast), (err) => {
+            if (err) {
+                console.log(err); 
+            }
+        });
         } else {
             console.log(`Did not find any performance issues in ${fileString}`);
         }
