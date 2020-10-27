@@ -1,4 +1,4 @@
-# jsrepo
+# jsPerformoBot
 
 Repository for the performance bot in JavaScript.
 
