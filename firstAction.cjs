@@ -35,6 +35,53 @@ try {
   console.log(owner);
   console.log(repo);
 
+  const prInfo = await getPullRequestInfo({
+    graphqlWithAuth,
+    prNumber: context.issue.number,
+    owner,
+    repo
+  });
+
+  console.log(prInfo.prNumber);
+
+  const files = prInfo.repository.pullRequest.files.nodes;
+
+  console.log(files);
+
 } catch (error) {
   core.setFailed(error.message);
+}
+
+async function getPullRequestInfo(
+  {
+    graphqlWithAuth, owner, repo, prNumber
+  }
+) {
+  return graphqlWithAuth(
+    gql`
+      query($owner: String!, $name: String!, $prNumber: Int!) {
+        repository(owner: $owner, name: $name) {
+          pullRequest(number: $prNumber) {
+            files(first: 100) {
+              nodes {
+                path
+              }
+            }
+            commits(last: 1) {
+              nodes {
+                commit {
+                  oid
+                }
+              }
+            }
+          }
+        }
+      }
+    `,
+    {
+      owner,
+      name: repo,
+      prNumber
+    }
+  );
 }
