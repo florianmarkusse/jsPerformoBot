@@ -7,6 +7,8 @@ const { Octokit } = require("@octokit/rest");
 try {
   console.log("testing");
 
+  const repoToken = core.getInput('repo-token');
+
   const octokit = new Octokit({
     auth: `token ${repoToken}`,
     userAgent: 'Branch Protection script',
