@@ -1,7 +1,8 @@
-import * as core from '@actions/core';
-import Octokit from '@octokit/rest';
-import * as github from '@actions/github';
-import { graphql } from '@octokit/graphql';
+const core = require('@actions/core');
+const github = require('@actions/github');
+
+const { graphql } = require("@octokit/graphql");
+const { Octokit } = require("@octokit/rest");
 
 try {
   console.log("testing");
