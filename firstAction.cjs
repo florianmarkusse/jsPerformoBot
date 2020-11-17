@@ -58,6 +58,7 @@ async function run() {
       graphqlWithAuth, owner, repo, prNumber
     }
   ) {
+    const gql = (s) => s.join('');
     return graphqlWithAuth(
       gql`
         query($owner: String!, $name: String!, $prNumber: Int!) {
