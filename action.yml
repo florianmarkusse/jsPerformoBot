@@ -1,13 +1,11 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'jePerformoBot'
+author: 'Florian Markusse'
+description: 'Uses jsPerformoBot to check for performance improvements.'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  repo-token:
+    description: 'github security token'
     required: true
-    default: 'World'
-outputs:
-  time: # id of output
-    description: 'The time we greeeeeted you'
+
 runs:
   using: 'node12'
-  main: 'firstAction.js'
+  main: 'dist/index.js'
