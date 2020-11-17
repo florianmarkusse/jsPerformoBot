@@ -7,7 +7,7 @@ inputs:
     default: 'World'
 outputs:
   time: # id of output
-    description: 'The time we greeted you'
+    description: 'The time we greeeeeted you'
 runs:
   using: 'node12'
   main: 'firstAction.js'
