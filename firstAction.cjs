@@ -12,7 +12,7 @@ try {
   const octokit = new Octokit({
     auth: `token ${repoToken}`,
     userAgent: 'Branch Protection script',
-    baseUrl: `https://api.${CONST.GITHUB_URL}`,
+    baseUrl: `https://api.github.com`,
     log: {
       debug: () => {
       },
