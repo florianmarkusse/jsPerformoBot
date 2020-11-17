@@ -16,7 +16,7 @@ import { solveMemberExpression } from './memberExpression.mjs';
 import { handleWhileStatement } from './whileStatement.mjs';
 import { handleDoWhileStatement } from './doWhileStatement.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
-import { solveLogicalExpressionChain } from './LogicalExpression.mjs';
+import { solveLogicalExpressionChain } from './logicalExpression.mjs';
 import { handleBlockStatement } from './blockStatement.mjs';
 import { handleUnaryExpression } from './unaryExpression.mjs';
 import { handleIfStatement } from './ifStatement.mjs';

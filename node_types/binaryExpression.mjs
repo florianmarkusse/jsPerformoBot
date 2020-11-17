@@ -8,7 +8,7 @@ import { NaNVariable } from '../types/NaNVariable.mjs';
 import { LiteralVariable } from '../types/literalVariable.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
 import { addToFixSet } from '../fixes/fix.mjs';
-import { BinaryUndefined } from '../fixes/binaryUndefined.mjs';
+import { UnnecessaryBinaryOperation } from '../fixes/UnnecessaryBinaryOperation.mjs';
 import { binaryOperation } from '../common/stringEval.mjs';
 import { NotDefinedVariable } from '../types/notDefinedVariable.mjs';
 
@@ -116,7 +116,7 @@ export function solveBinaryExpressionChain(baseNode) {
     }
 
     if ((leftUndefined || rightUndefined) && !baseNode.operator.includes("=")) {
-        addToFixSet(new BinaryUndefined(leftUndefined, rightUndefined, baseNode, result));
+        addToFixSet(new UnnecessaryBinaryOperation(leftUndefined, rightUndefined, baseNode, result));
     }
 
     return result;

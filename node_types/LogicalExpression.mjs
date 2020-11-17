@@ -6,7 +6,7 @@ import { createCorrectNodeBasedOnValue } from "../ast_utilities/nodes.mjs";
 import { VariableType } from '../types/variable.mjs';
 import { logicalBinaryOperation } from "../common/stringEval.mjs";
 import { addToFixSet } from "../fixes/fix.mjs";
-import { BinaryUndefined } from "../fixes/binaryUndefined.mjs";
+import { UnnecessaryBinaryOperation } from "../fixes/unnecessaryBinaryOperation.mjs";
 import { getParent } from "../ast_utilities/astTraversal.mjs";
 import { getBaseAST } from "../app.mjs";
 
@@ -45,14 +45,14 @@ export function solveLogicalExpressionChain(baseNode) {
             if (leftValue.type === VariableType.NaN ||
                 leftValue.type === VariableType.undefined ||
                 leftValue.type === VariableType.literal && Boolean(leftValue.value)) {
-                    addToFixSet(new BinaryUndefined(true, false, baseNode, result));
+                    addToFixSet(new UnnecessaryBinaryOperation(true, false, baseNode, result));
                 }
             break;
         case '||':
             if (leftValue.type === VariableType.NaN ||
                 leftValue.type === VariableType.undefined ||
                 leftValue.type === VariableType.literal && Boolean(leftValue.value)) {
-                    addToFixSet(new BinaryUndefined(false, true, baseNode, result));
+                    addToFixSet(new UnnecessaryBinaryOperation(false, true, baseNode, result));
                 }
             break;
     }

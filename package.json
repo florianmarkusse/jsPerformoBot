@@ -5,6 +5,8 @@
   "description": "bot for javascript performance",
   "main": "app.js",
   "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0",
     "escodegen": "^2.0.0",
     "espree": "^7.3.0",
     "estree-walker": "^2.0.1",
@@ -13,13 +15,14 @@
   },
   "devDependencies": {},
   "scripts": {
-    "binary": "node app.mjs binaryOperationUndefined.js",
+    "binary": "node app.mjs unnecessaryBinaryOperation.js",
     "reverse": "node app.mjs reverseArrayWrite.js",
     "undefinedRead": "node app.mjs undefinedRead.js",
     "test": "node app.mjs test.mjs",
     "bla": "node app.mjs bla.mjs",
     "debug": "node debug.js test.mjs",
-    "batch": "node app.mjs D:\\testositories2"
+    "batch": "node app.mjs",
+    "bar": "node app.mjs"
   },
   "author": "",
   "license": "ISC"

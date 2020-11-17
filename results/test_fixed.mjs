@@ -1,5 +1,5 @@
-class Thing extends OtherThing {
-    constructor(bla) {
-        this.thing = undefined;
+class Thing {
+    constructor(bar) {
+        this.foo = undefined;
     }
 }

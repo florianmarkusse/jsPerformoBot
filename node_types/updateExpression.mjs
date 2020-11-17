@@ -10,7 +10,7 @@ import { handleAssignmentExpression } from './assignmentExpression.mjs';
 import { solveBinaryExpressionChain } from './binaryExpression.mjs';
 import { solveMemberExpression } from './memberExpression.mjs';
 import { UndefinedVariable } from '../types/undefinedVariable.mjs';
-import { solveLogicalExpressionChain } from './LogicalExpression.mjs';
+import { solveLogicalExpressionChain } from './logicalExpression.mjs';
 import { handleUnaryExpression } from './unaryExpression.mjs';
 import { handleFunctionDeclaration } from './functionDeclaration.mjs';
 import { handleCallExpression } from './callExpression.mjs';

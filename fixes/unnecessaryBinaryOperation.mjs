@@ -14,11 +14,11 @@ const BinaryResult = Object.freeze({
     'false':'false'
 });
 
-export class BinaryUndefined {
-    constructor(leftUndefined, rightUndefined, nodeToChange, result) {
+export class UnnecessaryBinaryOperation {
+    constructor(leftUnnecessary, rightUnnecessary, nodeToChange, result) {
 
-        this.leftUndefined = leftUndefined;
-        this.rightUndefined = rightUndefined;
+        this.leftUnnecessary = leftUnnecessary;
+        this.rightUnnecessary = rightUnnecessary;
         this.nodeToChange = nodeToChange;
         this.result = result;
 
@@ -32,11 +32,11 @@ export class BinaryUndefined {
                 } else {
                     switch (nodeToChange.operator) {
                         case '|':
-                            if (leftUndefined && rightUndefined) {
+                            if (leftUnnecessary && rightUnnecessary) {
                                 this.newNode = BinaryResult.zero;
-                            } else if (leftUndefined) {
+                            } else if (leftUnnecessary) {
                                 this.newNode = BinaryResult.keepRight;
-                            } else if (rightUndefined) {
+                            } else if (rightUnnecessary) {
                                 this.newNode = BinaryResult.keepLeft;
                             }
                             break;
@@ -47,14 +47,14 @@ export class BinaryUndefined {
                             this.newNode = BinaryResult.false;
                         case '||':
                         case '&&':
-                            if (leftUndefined) {
+                            if (leftUnnecessary) {
                                 this.newNode = BinaryResult.keepRight;
                             } else {
                                 this.newNode = BinaryResult.keepLeft;
                             }
                             break;
                         case '<<':
-                            if (leftUndefined) {
+                            if (leftUnnecessary) {
                                 this.newNode = BinaryResult.zero;
                             } else {
                                 this.newNode = BinaryResult.keepLeft;
@@ -64,7 +64,6 @@ export class BinaryUndefined {
                             console.error("Wanting to change a node due to binary operation with undefined with different operator")
                             console.error(nodeToChange.operator);
                             throw Error();
-                            break;
                     }
                 }
                 break;
@@ -72,7 +71,7 @@ export class BinaryUndefined {
                 this.newNode = BinaryResult.undefined;
             case VariableType.unknown:
             case VariableType.notDefined:
-                if (leftUndefined) {
+                if (leftUnnecessary) {
                     this.newNode = BinaryResult.keepRight;
                 } else {
                     this.newNode = BinaryResult.keepLeft;
@@ -133,7 +132,7 @@ export class BinaryUndefined {
         }
     }
 
-    isEqualTo(binaryUndefined) {
+    isEqualTo(unnexessaryBinaryOperation) {
         return false;
     }
 }

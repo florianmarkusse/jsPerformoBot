@@ -14,38 +14,42 @@ import { containsInUnfixableSet } from './fixes/fix.mjs';
 let fileStringsToCheck = [];
 let filesFixed = [];
 let deepCopyAST;
+let batchMode = true;
+
+let inputDirectory;
+let outputDirectory;
+
+let procVarLength = process.argv.length;
+for (let i = 0; i < procVarLength; i++) {
+    console.log(String(process.argv[i]));
+}
 
 if (String(process.argv[2]).endsWith(".js") || String(process.argv[2]).endsWith(".mjs")) { 
     fileStringsToCheck[0] = './test_files/' + String(process.argv[2]);
+    batchMode = false;
 } else {
     // Batch mode
-    let result = getAllFilesRecursively(String(process.argv[2]));
-    fileStringsToCheck = getOnlyJSFiles(result);
-    if (process.argv[3]) {
-        fileStringsToCheck.splice(0, fileStringsToCheck.indexOf(process.argv[3]));
+    if (process.argv.length != 4) {
+        console.log("Specify input directory and output directory, e.g.: npm run bar C:\\testositories C:\\incorrectFiles");
+        throw Error();
+    } else {
+        inputDirectory = String(process.argv[2]) + "\\";
+        outputDirectory = String(process.argv[3]) + "\\";
     }
+
+    let result = getAllFilesRecursively(inputDirectory);
+    fileStringsToCheck = getOnlyJSFiles(result);
 }
 
 for (let i = 0; i < fileStringsToCheck.length; i++) {
+
     const fileString = fileStringsToCheck[i];
-    let newFilePath = "D:\\incorrectFiles2\\";
-    let filename = fileString.replace("D:\\testositories2\\", '')
-
-
-    let finalDot = filename.indexOf(".", 10);
-    let firstPart = filename.substring(0, finalDot)
-    let secondPart = filename.substring(finalDot);
-
-    firstPart += "_FIXED";
-    let fixedFileString = newFilePath + firstPart + secondPart;
-    let newFileString = newFilePath + fileString.replace("D:\\testositories2\\", '');
-
 
     if (fileString.includes('.min')) {
         continue;
     }
-    console.log(`Reading file ${fileString}`);
 
+    console.log(`Reading file ${fileString}`);
     let data = fs.readFileSync(fileString, function read(err, data) {
         if (err) {
             throw err;
@@ -64,11 +68,10 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
     let previousFix;
     let fixToDo;
     let foundFix = false;
+    let fixesApplied = [];
         do {
             // The processing happens here
             processAST(ast);
-            //
-
 
             let iterator = getFixSet().values();
             fixToDo = iterator.next().value;
@@ -83,6 +86,7 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
                 fixToDo.fix(ast);
                 if (!lodash.isEqual(ast, deepCopyAST)) {
                     foundFix = true;
+                    fixesApplied.push(fixToDo);
                 }
                 ast = espree.parse(escodegen.generate(ast), { tokens: false, ecmaVersion: 11 , sourceType: "module"});
                 previousFix = fixToDo;
@@ -90,68 +94,36 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
         } while(fixToDo !== undefined/*false*/);
     
         if (foundFix) {
-            console.log(`Fixed a performance issue in ${fileString}\n`);
+            fixesApplied.forEach(fix => {
+                console.log(fix);
+            });
             filesFixed.push(fileString);
 
-            let split = fileString.replace("D:\\testositories2\\", '').split("\\");
-            let pathBuilder = "D:\\incorrectFiles2";
-            for (let i = 0; i < split.length - 1; i++) {
-                pathBuilder += "\\" + split[i];
-                if (!fs.existsSync(pathBuilder)) {
-                    fs.mkdirSync(pathBuilder);
-                }
+            if (batchMode) {
+                batchWrite(fileString, data, ast);
+            } else {
+                testWrite(ast);
             }
-            /*
-            fs.writeFileSync(newFileString, data, (err) => {
-                if (err) {
-                    console.log(err); 
-                }
-            });
 
-            fs.writeFileSync(fixedFileString, escodegen.generate(ast), (err) => {
-                if (err) {
-                    console.log(err); 
-                }
-            });
-            */
-
-           fs.writeFileSync(".\\results\\test_fixed.mjs", escodegen.generate(ast), (err) => {
-            if (err) {
-                console.log(err); 
-            }
-        });
-        } else {
-            console.log(`Did not find any performance issues in ${fileString}`);
         }
-}
-
-console.log(`Fixed ${filesFixed.length} issues.`);
-console.log(`In the following files:`);
-for (let i = 0; i < filesFixed.length; i++) {
-    console.log(`${filesFixed[i]}`);
 }
 
 function processAST(ast) {
 
     clearGlobals();
     processASTNode(ast);
-    
-    
+        
     /*
     getVariables()[0].forEach(element => {
         console.log(element);
     });
-    */
-    
-    
-
     
     
     getFixSet().forEach(fix => {
         console.log(fix);
         console.log(fix.nodeToChange);
     })
-    
+    */
     
     
     return ast;
@@ -206,6 +178,47 @@ function getOnlyJSFiles(files) {
     })    
     
     return jsFiles;
+}
+
+function batchWrite(fileString, data, ast) {
+
+    let split = fileString.replace(inputDirectory, '').split("\\");
+
+    let pathBuilder = outputDirectory;
+    let fixedPath;
+
+    for (let i = 0; i < split.length; i++) {
+        if (i < split.length - 1) {
+            pathBuilder += "\\" + split[i];
+            if (!fs.existsSync(pathBuilder)) {
+                fs.mkdirSync(pathBuilder);
+            }
+        } else {
+            fixedPath = pathBuilder + "\\\\FIXED_" + split[i];
+            pathBuilder += "\\\\" + split[i];
+        }
+    }
+
+
+    fs.writeFileSync(pathBuilder, data, (err) => {
+        if (err) {
+            console.log(err); 
+        }
+    });
+
+    fs.writeFileSync(fixedPath, escodegen.generate(ast), (err) => {
+        if (err) {
+            console.log(err); 
+        }
+    });
+}
+
+function testWrite(ast) {
+    fs.writeFileSync(".\\results\\test_fixed.mjs", escodegen.generate(ast), (err) => {
+        if (err) {
+            console.log(err); 
+        }
+    });
 }
 
 

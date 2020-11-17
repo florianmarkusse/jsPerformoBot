@@ -28,5 +28,12 @@ export function handleCallExpression(callNode) {
 
     processASTNode(callNode.callee);
 
+    if (callNode.callee && callNode.callee.object) {
+        if (callNode.callee.object.name) {
+            handleVariableDeclarator(createUnknownVariableDeclaratorNode(callNode.callee.object.name));
+        }
+    }
+
+
     return new UnknownVariable();
 }

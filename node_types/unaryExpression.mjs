@@ -11,6 +11,7 @@ export function handleUnaryExpression(unaryNode) {
     if (unaryNode.operator === "delete" ||
     unaryNode.operator === "void" ||
     unaryNode.operator === "typeof") {
+        getVariable(unaryNode.argument);
         return new UnknownVariable();
     }
 
