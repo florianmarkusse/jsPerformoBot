@@ -4,84 +4,88 @@ const github = require('@actions/github');
 const { graphql } = require("@octokit/graphql");
 const { Octokit } = require("@octokit/rest");
 
-try {
-  console.log("testing");
+async function run() {
+  try {
+    console.log("testing");
 
-  const repoToken = core.getInput('repo-token');
+    const repoToken = core.getInput('repo-token');
 
-  const octokit = new Octokit({
-    auth: `token ${repoToken}`,
-    userAgent: 'Branch Protection script',
-    baseUrl: `https://api.github.com`,
-    log: {
-      debug: () => {
+    const octokit = new Octokit({
+      auth: `token ${repoToken}`,
+      userAgent: 'Branch Protection script',
+      baseUrl: `https://api.github.com`,
+      log: {
+        debug: () => {
+        },
+        info: () => {
+        },
+        warn: console.warn,
+        error: console.error
       },
-      info: () => {
-      },
-      warn: console.warn,
-      error: console.error
-    },
-    previews: ['antiope-preview']
-  });
+      previews: ['antiope-preview']
+    });
 
-  const graphqlWithAuth = graphql.defaults({
-    headers: {
-      authorization: `token ${repoToken}`
-    }
-  });
-  const { context } = github;
-  const { owner, repo } = context.repo;
+    const graphqlWithAuth = graphql.defaults({
+      headers: {
+        authorization: `token ${repoToken}`
+      }
+    });
+    const { context } = github;
+    const { owner, repo } = context.repo;
 
-  console.log(owner);
-  console.log(repo);
+    console.log(owner);
+    console.log(repo);
 
-  const prInfo = await getPullRequestInfo({
-    graphqlWithAuth,
-    prNumber: context.issue.number,
-    owner,
-    repo
-  });
+    const prInfo = await getPullRequestInfo({
+      graphqlWithAuth,
+      prNumber: context.issue.number,
+      owner,
+      repo
+    });
 
-  console.log(prInfo.prNumber);
+    console.log(prInfo.prNumber);
 
-  const files = prInfo.repository.pullRequest.files.nodes;
+    const files = prInfo.repository.pullRequest.files.nodes;
 
-  console.log(files);
+    console.log(files);
 
-} catch (error) {
-  core.setFailed(error.message);
-}
-
-async function getPullRequestInfo(
-  {
-    graphqlWithAuth, owner, repo, prNumber
+  } catch (error) {
+    core.setFailed(error.message);
   }
-) {
-  return graphqlWithAuth(
-    gql`
-      query($owner: String!, $name: String!, $prNumber: Int!) {
-        repository(owner: $owner, name: $name) {
-          pullRequest(number: $prNumber) {
-            files(first: 100) {
-              nodes {
-                path
+
+  async function getPullRequestInfo(
+    {
+      graphqlWithAuth, owner, repo, prNumber
+    }
+  ) {
+    return graphqlWithAuth(
+      gql`
+        query($owner: String!, $name: String!, $prNumber: Int!) {
+          repository(owner: $owner, name: $name) {
+            pullRequest(number: $prNumber) {
+              files(first: 100) {
+                nodes {
+                  path
+                }
               }
-            }
-            commits(last: 1) {
-              nodes {
-                commit {
-                  oid
+              commits(last: 1) {
+                nodes {
+                  commit {
+                    oid
+                  }
                 }
               }
             }
           }
         }
+      `,
+      {
+        owner,
+        name: repo,
+        prNumber
       }
-    `,
-    {
-      owner,
-      name: repo,
-      prNumber
-    }
-  );
+    );
+  }
 }
+
+run();
