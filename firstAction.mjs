@@ -5,9 +5,6 @@ import { graphql } from '@octokit/graphql';
 
 try {
   console.log("testing");
-
-
-
 } catch (error) {
   core.setFailed(error.message);
 }
