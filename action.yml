@@ -1,11 +1,13 @@
-name: 'jsPerformoBot'
-description: 'Check for performance suggestions.'
-
+name: 'Hello World'
+description: 'Greet someone and record the time'
 inputs:
-  repo-token:
-    description: 'github security token'
+  who-to-greet:  # id of input
+    description: 'Who to greet'
     required: true
-
+    default: 'World'
+outputs:
+  time: # id of output
+    description: 'The time we greeeeeted you'
 runs:
   using: 'node12'
   main: 'firstAction.js'
