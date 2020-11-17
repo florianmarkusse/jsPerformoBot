@@ -8,4 +8,4 @@ inputs:
 
 runs:
   using: 'node12'
-  main: 'firstAction.js'
+  main: 'firstAction.mjs'
