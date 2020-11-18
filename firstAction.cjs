@@ -3,7 +3,9 @@ const github = require('@actions/github');
 
 const { graphql } = require("@octokit/graphql");
 const { Octokit } = require("@octokit/rest");
+
 const { existsSync } = require("fs");
+const { extname } = require("path");
 
 async function run() {
   try {
