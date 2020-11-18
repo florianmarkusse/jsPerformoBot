@@ -6,7 +6,7 @@ const { Octokit } = require("@octokit/rest");
 
 const { existsSync } = require("fs");
 const { extname } = require("path");
-const { path } = require("path");
+const { join } = require("path");
 const { espree } = require("espree");
 
 async function run() {
@@ -69,7 +69,7 @@ async function run() {
 
       const workingDirectory = process.env.GITHUB_WORKSPACE_WORKSPACE;
 
-      let firstFile = path.join(workingDirectory, filesToLint[0]);
+      let firstFile = join(workingDirectory, filesToLint[0]);
       console.log(firstFile);
 
       let data = fs.readFileSync(firstFile, function read(err, data) {
