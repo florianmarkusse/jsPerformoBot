@@ -27,24 +27,27 @@ async function run() {
 
     const graphqlWithAuth = graphql.defaults({
       headers: {
-        authorization: `token ${repoToken}`,
-      },
-    });
-    const { repository } = await graphqlWithAuth(`
-      {
-        repository(owner: "octokit", name: "graphql.js") {
-          issues(last: 3) {
-            edges {
-              node {
-                title
-              }
-            }
-          }
-        }
+        authorization: `token ${repoToken}`
       }
-    `);
+    });
+    const { context } = github;
+    const { owner, repo } = context.repo;
 
-    console.log(repository)
+    console.log(owner);
+    console.log(repo);
+
+    const prInfo = await getPullRequestInfo({
+      graphqlWithAuth,
+      prNumber: context.issue.number,
+      owner,
+      repo
+    });
+
+    console.log(prInfo.prNumber);
+
+    const files = prInfo.repository.pullRequest.files.nodes;
+
+    console.log(files);
 
   } catch (error) {
     core.setFailed(error.message);
