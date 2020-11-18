@@ -63,7 +63,7 @@ async function run() {
       }
 
       console.log(filesToLint);
-      console/log(sha);
+      console.log(sha);
       console.log(GITHUB_WORKSPACE);
       console.log(GITHUB_EVENT_PATH);
       console.log(GITHUB_SHA);
