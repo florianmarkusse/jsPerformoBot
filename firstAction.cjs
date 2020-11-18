@@ -117,6 +117,7 @@ async function getPullRequestInfo(
 }
 
 async function readWorkspace() {
+  console.log("here");
   fs.readdirSync(process.env.GITHUB_WORKSPACE,  
     { withFileTypes: true }, 
     (err, files) => { 
