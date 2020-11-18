@@ -49,8 +49,10 @@ async function run() {
       const sha = prInfo.repository.pullRequest.commits.nodes[0].commit.oid;
       const files = prInfo.repository.pullRequest.files.nodes;
 
+      console.log(files);
+
       const filesToLint = files
-        .filter((file) => EXTENSIONS_TO_LINT.includes(extname(file.path)) && isFileOk(file.path))
+        .filter((file) => EXTENSIONS_TO_LINT.includes(extname(file.path))
         .map((file) => file.path);
       if (filesToLint.length < 1) {
         const extensionsString = EXTENSIONS_TO_LINT.join(', ');
@@ -60,7 +62,6 @@ async function run() {
         return;
       }
 
-      console.log(files);
       console.log(filesToLint);
 
   } catch (error) {
@@ -72,20 +73,6 @@ const EXTENSIONS_TO_LINT = [
   '.mjs',
   '.js',
 ];
-
-const isFileOk = (path) => {
-  try {
-      if (existsSync(path)) {
-      // console.log(`Path: ${path} is valid`);
-      return true;
-      }
-  } catch (err) {
-      console.error(err);
-  }
-  // console.log(`Path: ${path} is not valid`);
-
-  return false;
-};
 
 async function getPullRequestInfo(
 {
