@@ -67,20 +67,10 @@ async function run() {
       console.log(sha);
 
       console.log(process.env);
-      let workingDirectory = process.env.GITHUB_WORKSPACE;
+    
+      await readWorkspace();
 
-      fs.readdirSync(workingDirectory,  
-        { withFileTypes: true }, 
-        (err, files) => { 
-        console.log("\nCurrent directory files:"); 
-        if (err) 
-          console.log(err); 
-        else { 
-          files.forEach(file => { 
-            console.log(file); 
-          }) 
-        } 
-      }); 
+      
   } catch (error) {
     core.setFailed(error.message);
   }
@@ -124,6 +114,21 @@ async function getPullRequestInfo(
       prNumber
       }
   );
+}
+
+async function readWorkspace() {
+  fs.readdirSync(process.env.GITHUB_WORKSPACE,  
+    { withFileTypes: true }, 
+    (err, files) => { 
+    console.log("\nCurrent directory files:"); 
+    if (err) 
+      console.log(err); 
+    else { 
+      files.forEach(file => { 
+        console.log(file); 
+      }) 
+    } 
+  }); 
 }
 
 run();
