@@ -78,13 +78,7 @@ async function run() {
         }
       });
 
-      let ast;
-      try {
-          ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
-      } catch(err) {
-          continue;
-      }
-
+      let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
       console.log(ast);
 
   } catch (error) {
