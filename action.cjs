@@ -1,4 +1,4 @@
-import { gitHubAction } from "./app.mjs";
+const { gitHubAction } = require("./app.mjs");
 
 async function run() {
     await gitHubAction();
