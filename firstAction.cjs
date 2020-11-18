@@ -68,8 +68,9 @@ async function run() {
       console.log(sha);
 
       const workingDirectory = process.env.GITHUB_WORKSPACE_WORKSPACE;
+      console.log(workingDirectory);
 
-      let firstFile = join(workingDirectory, filesToLint[0]);
+      let firstFile = join(String(workingDirectory), filesToLint[0]);
       console.log(firstFile);
 
       let data = fs.readFileSync(firstFile, function read(err, data) {
