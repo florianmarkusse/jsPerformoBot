@@ -8,7 +8,7 @@ const fs = require("fs");
 const { extname, join } = require("path");
 const espree = require("espree");
 
-const { gitHubAction } = require("./app.mjs");
+const { gitHubAction } = require("./app.js");
 
 async function run() {
   try {
