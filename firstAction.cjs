@@ -52,41 +52,41 @@ async function run() {
   } catch (error) {
     core.setFailed(error.message);
   }
+}
 
-  async function getPullRequestInfo(
-    {
-      graphqlWithAuth, owner, repo, prNumber
-    }
-  ) {
-    const gql = (s) => s.join('');
-    return graphqlWithAuth(
-      gql`
-        query($owner: String!, $name: String!, $prNumber: Int!) {
-          repository(owner: $owner, name: $name) {
-            pullRequest(number: $prNumber) {
-              files(first: 100) {
-                nodes {
-                  path
-                }
+async function getPullRequestInfo(
+  {
+    graphqlWithAuth, owner, repo, prNumber
+  }
+) {
+  const gql = (s) => s.join('');
+  return graphqlWithAuth(
+    gql`
+      query($owner: String!, $name: String!, $prNumber: Int!) {
+        repository(owner: $owner, name: $name) {
+          pullRequest(number: $prNumber) {
+            files(first: 100) {
+              nodes {
+                path
               }
-              commits(last: 1) {
-                nodes {
-                  commit {
-                    oid
-                  }
+            }
+            commits(last: 1) {
+              nodes {
+                commit {
+                  oid
                 }
               }
             }
           }
         }
-      `,
-      {
-        owner,
-        name: repo,
-        prNumber
       }
-    );
-  }
+    `,
+    {
+      owner,
+      name: repo,
+      prNumber
+    }
+  );
 }
 
 run();
