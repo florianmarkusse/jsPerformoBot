@@ -8,7 +8,7 @@ const fs = require("fs");
 const { extname, join } = require("path");
 const espree = require("espree");
 
-import { gitHubAction } from "./app.mjs";
+const { gitHubAction } = require("./app.mjs");
 
 async function run() {
   try {
