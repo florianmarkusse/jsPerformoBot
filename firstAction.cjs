@@ -66,7 +66,10 @@ async function run() {
       console.log(filesToLint);
       console.log(sha);
 
-      const workingDirectory = process.env.GITHUB_WORKSPACE;
+      console.log(process.env);
+      let workingDirectory = process.env.GITHUB_WORKSPACE;
+      const lastIndex = workingDirectory.lastIndexOf("/");
+      workingDirectory = workingDirectory.substr(0, lastIndex + 1);
       console.log(workingDirectory);
 
       let firstFile = join(workingDirectory, filesToLint[0]);
