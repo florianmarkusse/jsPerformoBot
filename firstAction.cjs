@@ -4,10 +4,9 @@ const github = require('@actions/github');
 const { graphql } = require("@octokit/graphql");
 const { Octokit } = require("@octokit/rest");
 
-const { fs } = require("fs");
-const { extname } = require("path");
-const { join } = require("path");
-const { espree } = require("espree");
+const fs = require("fs");
+const { extname, join } = require("path");
+const espree = require("espree");
 
 async function run() {
   try {
@@ -70,7 +69,7 @@ async function run() {
       const workingDirectory = process.env.GITHUB_WORKSPACE;
       console.log(workingDirectory);
 
-      let firstFile = join(String(workingDirectory), filesToLint[0]);
+      let firstFile = join(workingDirectory, filesToLint[0]);
       console.log(firstFile);
 
       let data = fs.readFileSync(firstFile, function read(err, data) {
