@@ -6,6 +6,8 @@ const { Octokit } = require("@octokit/rest");
 
 const { existsSync } = require("fs");
 const { extname } = require("path");
+const { path } = require("path");
+const { espree } = require("espree");
 
 async function run() {
   try {
@@ -64,7 +66,26 @@ async function run() {
 
       console.log(filesToLint);
       console.log(sha);
-      console.log(process.env);
+
+      const workingDirectory = process.env.GITHUB_WORKSPACE_WORKSPACE;
+
+      let firstFile = path.join(workingDirectory, filesToLint[0]);
+      console.log(firstFile);
+
+      let data = fs.readFileSync(firstFile, function read(err, data) {
+        if (err) {
+            throw err;
+        }
+      });
+
+      let ast;
+      try {
+          ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
+      } catch(err) {
+          continue;
+      }
+
+      console.log(ast);
 
   } catch (error) {
     core.setFailed(error.message);
