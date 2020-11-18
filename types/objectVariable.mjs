@@ -7,7 +7,7 @@ import { inUnknownLoop } from './variable.mjs';
 import { UnknownVariable } from "../types/unknownVariable.mjs";
 import { getFromVariables } from './variable.mjs';
 import { getParent } from '../ast_utilities/astTraversal.mjs';
-import { getBaseAST } from '../app.mjs';
+const { getBaseAST } = require("../app.mjs");
 
 let reservedKeyWords = [
     'toString',

@@ -8,7 +8,8 @@ import { logicalBinaryOperation } from "../common/stringEval.mjs";
 import { addToFixSet } from "../fixes/fix.mjs";
 import { UnnecessaryBinaryOperation } from "../fixes/unnecessaryBinaryOperation.mjs";
 import { getParent } from "../ast_utilities/astTraversal.mjs";
-import { getBaseAST } from "../app.mjs";
+
+const { getBaseAST } = require("../app.mjs");
 
 
 export function solveLogicalExpressionChain(baseNode) {

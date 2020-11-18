@@ -222,10 +222,12 @@ function testWrite(ast) {
 }
 
 
-export function getBaseAST() {
+function getBaseAST() {
     return deepCopyAST;
 }
 
-export async function gitHubAction(files) {
+async function gitHubAction(files) {
     console.log("herro from app.mjs");
 }
+
+module.exports = {getBaseAST, gitHubAction};
