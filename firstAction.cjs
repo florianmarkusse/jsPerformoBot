@@ -67,10 +67,17 @@ async function run() {
       console.log(sha);
 
       console.log(process.env);
-    
-      await readWorkspace();
+      let workingDirectory = process.env.GITHUB_WORKSPACE;
+      console.log(workingDirectory);
 
-      
+      let firstFile = join(workingDirectory, filesToLint[0]);
+      console.log(firstFile);
+
+      let data = await readAFile(firstFile);
+
+      let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
+      console.log(ast);
+
   } catch (error) {
     core.setFailed(error.message);
   }
@@ -80,6 +87,14 @@ const EXTENSIONS_TO_LINT = [
   '.mjs',
   '.js',
 ];
+
+async function readAFile(path) {
+  return fs.readFile(path, function read(err, data) {
+    if (err) {
+        throw err;
+    }
+  });
+}
 
 async function getPullRequestInfo(
 {
@@ -114,24 +129,6 @@ async function getPullRequestInfo(
       prNumber
       }
   );
-}
-
-async function readWorkspace() {
-  console.log("here");
-  fs.readdir(process.cwd(),  
-    { withFileTypes: true }, 
-    (err, files) => { 
-    console.log("\nCurrent directory files:"); 
-    if (err) {
-        console.log("error");
-        console.log(err); 
-    }
-    else { 
-      files.forEach(file => { 
-          console.log(file); 
-      }) 
-    } 
-  }); 
 }
 
 run();
