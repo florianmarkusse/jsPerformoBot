@@ -53,7 +53,7 @@ async function run() {
 
       const filesToLint = files
         .filter((file) => EXTENSIONS_TO_LINT.includes(extname(file.path))
-        .map((file) => file.path);
+        .map((file) => file.path));
       if (filesToLint.length < 1) {
         const extensionsString = EXTENSIONS_TO_LINT.join(', ');
         console.warn(
