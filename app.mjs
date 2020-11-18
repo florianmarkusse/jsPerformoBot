@@ -226,6 +226,6 @@ export function getBaseAST() {
     return deepCopyAST;
 }
 
-export function gitHubAction(files) {
+export async function gitHubAction(files) {
     console.log("herro from app.mjs");
 }
