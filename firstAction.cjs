@@ -68,22 +68,19 @@ async function run() {
 
       console.log(process.env);
       let workingDirectory = process.env.GITHUB_WORKSPACE;
-      const lastIndex = workingDirectory.lastIndexOf("/");
-      workingDirectory = workingDirectory.substr(0, lastIndex + 1);
-      console.log(workingDirectory);
 
-      let firstFile = join(workingDirectory, filesToLint[0]);
-      console.log(firstFile);
-
-      let data = fs.readFileSync(firstFile, function read(err, data) {
-        if (err) {
-            throw err;
-        }
-      });
-
-      let ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
-      console.log(ast);
-
+      fs.readdirSync(workingDirectory,  
+        { withFileTypes: true }, 
+        (err, files) => { 
+        console.log("\nCurrent directory files:"); 
+        if (err) 
+          console.log(err); 
+        else { 
+          files.forEach(file => { 
+            console.log(file); 
+          }) 
+        } 
+      }); 
   } catch (error) {
     core.setFailed(error.message);
   }
