@@ -118,7 +118,7 @@ async function getPullRequestInfo(
 
 async function readWorkspace() {
   console.log("here");
-  fs.readdir(process.env.GITHUB_WORKSPACE,  
+  fs.readdir(process.cwd(),  
     { withFileTypes: true }, 
     (err, files) => { 
     console.log("\nCurrent directory files:"); 
