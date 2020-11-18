@@ -118,15 +118,17 @@ async function getPullRequestInfo(
 
 async function readWorkspace() {
   console.log("here");
-  fs.readdirSync(process.env.GITHUB_WORKSPACE,  
+  fs.readdir(process.env.GITHUB_WORKSPACE,  
     { withFileTypes: true }, 
     (err, files) => { 
     console.log("\nCurrent directory files:"); 
-    if (err) 
-      console.log(err); 
+    if (err) {
+        console.log("error");
+        console.log(err); 
+    }
     else { 
       files.forEach(file => { 
-        console.log(file); 
+          console.log(file); 
       }) 
     } 
   }); 
