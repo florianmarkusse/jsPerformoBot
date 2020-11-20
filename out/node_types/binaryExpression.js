@@ -23,7 +23,7 @@ var _undefinedVariable = require("../types/undefinedVariable.js");
 
 var _fix = require("../fixes/fix.js");
 
-var _UnnecessaryBinaryOperation = require("../fixes/UnnecessaryBinaryOperation.js");
+var _UnnecessaryBinaryOperation = require("../fixes/unnecessaryBinaryOperation.js");
 
 var _stringEval = require("../common/stringEval.js");
 

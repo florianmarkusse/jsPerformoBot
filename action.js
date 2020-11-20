@@ -4,7 +4,7 @@ var app = require("./out/app.js")
 async function run() {
 
     try {
-        (0, appgitHubAction)();
+        (0, app.gitHubAction)();
     }
     catch (error) {
         core.setFailed(error.message);
