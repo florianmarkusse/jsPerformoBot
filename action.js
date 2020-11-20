@@ -65,7 +65,7 @@ async function run() {
 
             let filesObject = {};
 
-            for (let i = 0; i < results.length; i++) {
+            for (let i = 0; i < results.length; i+=2) {
                 let split = results[i].split("/");
                 let filePath = "";
 
