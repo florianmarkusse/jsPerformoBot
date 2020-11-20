@@ -38,9 +38,9 @@ async function run() {
         const Octo = new Octokit({auth: repoToken});
         console.log(process.env.GITHUB_REPOSITORY);
 
-        let result = await octokit.request('GET /repos/{owner}/{repo}', {
-            owner: 'octocat',
-            repo: 'hello-world'
+        let result = await Octo.request('GET /repos/{owner}/{repo}', {
+            owner: 'florianmarkusse',
+            repo: 'WorkFlowTesting'
           })
 
         console.log(result);
