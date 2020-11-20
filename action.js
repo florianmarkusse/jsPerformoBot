@@ -35,6 +35,7 @@ async function run() {
         console.log(files);
 
         let results = (0, app.gitHubAction)(files);
+        console.log(results);
 
         
         const octo = new MyOctokit({
