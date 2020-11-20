@@ -37,14 +37,15 @@ async function run() {
 
         const Octo = new Octokit({auth: repoToken});
 
-        let slash = process.env.GITHUB_REPOSITORY.indexOf("/");
+        let stringified = String(process.env.GITHUB_REPOSITORY);
+        let slash = stringified.indexOf("/");
 
-        let firstOwner = process.env.GITHUB_REPOSITORY.substr(0, slash);
-        let secondRepo = process.env.GITHUB_REPOSITORY.substr(slash + 1, process.env.GITHUB_REPOSITORY.length);
+        let firstOwner = stringified.substr(0, slash);
+        let secondRepo = stringified.substr(slash + 1, stringified.length);
 
         let result2 = await Octo.request('POST /repos/{owner}/{repo}/git/refs', {
-            owner: firstOwner,
-            repo: secondRepo,
+            owner: "florianmarkusse",
+            repo: "WorkFlowTesting",
             ref: 'refs/heads/blabla',
             sha: 'e6e68bd5fc0dca570de4648ac473c22041d6acfd'
           })
