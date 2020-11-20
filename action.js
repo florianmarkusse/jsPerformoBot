@@ -122,7 +122,7 @@ async function run() {
                 .createPullRequest({
                     owner: firstOwner,
                     repo: secondRepo,
-                    title: "jsPerformoBot: performance improvement suggestion",
+                    title: "jsPerformoBot: performance improvement suggestion(s)",
                     body: greetings + technicalPart + disclaimer + goodBye,
                     base: baseBranch /* optional: defaults to default branch */,
                     head: `jsPerformoBot-PR-${baseBranch}-${Date.now()}`,
