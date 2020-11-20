@@ -1,5 +1,4 @@
 {
-  "type": "module",
   "name": "work",
   "version": "1.0.0",
   "description": "bot for javascript performance",
@@ -7,8 +6,10 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
+    "@babel/polyfill": "^7.12.1",
     "@octokit/graphql": "^4.5.7",
     "@octokit/rest": "^18.0.9",
+    "core-js": "^3.7.0",
     "escodegen": "^2.0.0",
     "espree": "^7.3.0",
     "estree-walker": "^2.0.1",
@@ -16,9 +17,14 @@
     "lodash": "^4.17.20",
     "path": "^0.12.7"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-transform-modules-commonjs": "^7.12.1",
+    "@babel/preset-env": "^7.12.1"
+  },
   "scripts": {
-    "binary": "node app.mjs unnecessaryBinaryOperation.js",
+    "binary": "node out/app.js unnecessaryBinaryOperation.js",
     "reverse": "node app.mjs reverseArrayWrite.js",
     "undefinedRead": "node app.mjs undefinedRead.js",
     "test": "node app.mjs test.mjs",
