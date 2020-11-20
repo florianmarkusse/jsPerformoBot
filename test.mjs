@@ -1,31 +1,11 @@
-import OctoKit from "@octokit/core";
-import pkg from '@octokit/rest';
-const { Octokit } = pkg;
-import createPullRequest from "octokit-plugin-create-pull-request";
+let string =  "refs/heads/main"
 
+let result = string.split("/");
+console.log(result);
 
+let newString = "";
+for (let i = 2; i < result.length; i++) {
+    newString += result[i];
+}
 
-const octo = Octokit.plugin(
-    createPullRequest
-);
-
-octo
-            .createPullRequest({
-                owner: firstOwner,
-                repo: secondRepo,
-                title: "pull request title",
-                body: "pull request description",
-                //base: "main" /* optional: defaults to default branch */,
-                head: "pull-request-branch-name",
-                changes: [
-                {
-                    /* optional: if `files` is not passed, an empty commit is created instead */
-                    files: {
-                    "path/to/file1.txt": "Content for file1",
-                    },
-                    commit:
-                    "new commit",
-                },
-                ],
-            })
-        .then((pr) => console.log(pr.data.number));
+console.log(newString);

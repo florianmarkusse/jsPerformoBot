@@ -47,7 +47,12 @@ async function run() {
         let firstOwner = stringified.substr(0, slash);
         let secondRepo = stringified.substr(slash + 1, stringified.length);
 
-        console.log(process.env.GITHUB_REF);
+
+        let split = process.env.GITHUB_REF.split("/");
+        let baseBranch = "";
+        for (let i = 2; i < split.length; i++) {
+            baseBranch += split[i];
+        }
 
         octo
             .createPullRequest({
@@ -55,8 +60,8 @@ async function run() {
                 repo: secondRepo,
                 title: "pull request title",
                 body: "pull request description",
-                base: process.env.GITHUB_REF /* optional: defaults to default branch */,
-                head: `jsPerformoBot-PR-${process.env.GITHUB_REF}-${new Date()}`,
+                base: baseBranch /* optional: defaults to default branch */,
+                head: `jsPerformoBot-PR-${baseBranch}-${new Date()}`,
                 changes: [
                 {
                     /* optional: if `files` is not passed, an empty commit is created instead */
