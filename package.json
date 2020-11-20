@@ -16,6 +16,7 @@
     "estree-walker": "^2.0.1",
     "fs": "0.0.1-security",
     "lodash": "^4.17.20",
+    "octokit-plugin-create-pull-request": "^3.9.0",
     "path": "^0.12.7"
   },
   "devDependencies": {
