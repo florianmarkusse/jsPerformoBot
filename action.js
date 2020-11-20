@@ -10,7 +10,7 @@ const MyOctokit = Octokit.Octokit.plugin(createPullRequest);
 
 let greetings = "Hello,\n\n"
 let goodBye = "Kind regards,\nFlorian Markusse, author of jsPerformoBot";
-let disclaimer = "NB: this bot also generates false positives at time, please review the pull request.\n\n"
+let disclaimer = "NB: this bot generates false positives at times, please review the pull request.\n\n"
 
 const fixTypes = {
     UNDEFINED_READ: "undefinedRead",
