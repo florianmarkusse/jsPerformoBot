@@ -53,8 +53,8 @@ async function run() {
                 repo: secondRepo,
                 title: "pull request title",
                 body: "pull request description",
-                base: GITHUB_REF /* optional: defaults to default branch */,
-                head: `jsPerformoBot-PR-${GITHUB_REF}-${new Date()}`,
+                base: process.env.GITHUB_REF /* optional: defaults to default branch */,
+                head: `jsPerformoBot-PR-${process.env.GITHUB_REF}-${new Date()}`,
                 changes: [
                 {
                     /* optional: if `files` is not passed, an empty commit is created instead */
