@@ -47,6 +47,8 @@ async function run() {
         let firstOwner = stringified.substr(0, slash);
         let secondRepo = stringified.substr(slash + 1, stringified.length);
 
+        console.log(process.env.GITHUB_REF);
+
         octo
             .createPullRequest({
                 owner: firstOwner,
