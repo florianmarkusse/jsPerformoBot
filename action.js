@@ -60,11 +60,27 @@ async function run() {
         }
         else {
 
+            
+            
+
             let filesObject = {};
 
             for (let i = 0; i < results.length; i++) {
-                filesObject[results[i]] = results[i+1];
+                let split = results[i]
+                let filePath = "";
+
+                for (let i = 6; i < split.length; i++) {
+                    if (i == split.length - 1) {
+                        filePath += split[i];
+                    } else {
+                        filePath += split[i] + "/";
+                    }
+                }
+
+                filesObject[filePath] = results[i+1];
             }
+
+            console.log(filesObject);
 
             octo
                 .createPullRequest({

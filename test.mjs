@@ -1,8 +1,4 @@
-let vari = "pat";
-let thing = {
-};
-thing[vari] = "value"
+let vari = "/home/runner/work/WorkFlowTesting/WorkFlowTesting/example1.js"
+let split = vari.split("/");
 
-console.log(thing);
-
-
+console.log(split);
