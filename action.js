@@ -4,10 +4,9 @@ var app = require("./out/app.js")
 var fs = require("fs");
 var path = require("path");
 
-const { OctoKit } = require("@octokit/rest");
-const MyOctokit = OctoKit.plugin(
-    require('octokit-plugin-create-pull-request')
-);
+const Octokit = require("@octokit/core");
+const { createPullRequest } = require("octokit-plugin-create-pull-request");
+const MyOctokit = Octokit.Octokit.plugin(createPullRequest);
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
 var walkSync = function(dir, filelist) {
