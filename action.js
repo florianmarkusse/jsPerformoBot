@@ -8,6 +8,27 @@ const Octokit = require("@octokit/core");
 const { createPullRequest } = require("octokit-plugin-create-pull-request");
 const MyOctokit = Octokit.Octokit.plugin(createPullRequest);
 
+let greetings = "Hello,\n"
+let goodBye = "Kind regards,\njsPerformoBot";
+let disclaimer = "NB: this bot also generates false positives at time, please review the pull request.\n"
+
+const fixTypes = {
+    UNDEFINED_READ: "undefinedRead",
+    REVERSE_ARRAY_WRITE: "reverseArrayWrite",
+    UNNECESSARYBINARYOPERATION: "unnecessaryBinaryOperation",
+}
+
+const messages = [
+    // Undefined read
+    "A variable that is *undefined* was read from. Propose to change the assignment to *undefined* if intended behaviour.\n",
+    // Reverse array write
+    "An array is written to in reverse order. This cause a degradation in performance, thus I propose to change the order the array is written to.\n",
+    // Unnecessary binary operation.
+    "A binary operation is performed where the results is already known or partially known. Propose to remove this binary operation.\n",
+];
+
+
+
 // List all files in a directory in Node.js recursively in a synchronous fashion
 var walkSync = function(dir, filelist) {
     
@@ -65,7 +86,9 @@ async function run() {
 
             let filesObject = {};
 
-            for (let i = 0; i < results.length; i+=2) {
+            let technicalPart = "";
+
+            for (let i = 0; i < results.length; i+=3) {
                 let split = results[i].split("/");
                 let filePath = "";
 
@@ -78,6 +101,19 @@ async function run() {
                 }
 
                 filesObject[filePath] = results[i+1];
+
+                technicalPart += `In file ${filePath} I found the following issue:\n`
+                switch (results[i + 1]){
+                    case fixTypes.UNDEFINED_READ:
+                        technicalPart += messages[0];
+                        break;
+                    case fixTypes.REVERSE_ARRAY_WRITE:
+                        technicalPart += messages[1];
+                        break;
+                    case fixTypes.UNNECESSARYBINARYOPERATION:
+                        technicalPart += messages[2];
+                        break;
+                }
             }
 
             console.log(filesObject);
@@ -86,16 +122,15 @@ async function run() {
                 .createPullRequest({
                     owner: firstOwner,
                     repo: secondRepo,
-                    title: "pull request title",
-                    body: "pull request description",
+                    title: "jsPerformoBot: performance improvement suggestion",
+                    body: greetings + technicalPart + disclaimer + goodBye,
                     base: baseBranch /* optional: defaults to default branch */,
                     head: `jsPerformoBot-PR-${baseBranch}-${Date.now()}`,
                     changes: [
                     {
                         /* optional: if `files` is not passed, an empty commit is created instead */
                         files: filesObject,
-                        commit:
-                        "new commit",
+                        commit: "Chore: performance suggestion(s)",
                     },
                     ],
                 })

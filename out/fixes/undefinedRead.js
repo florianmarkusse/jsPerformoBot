@@ -12,6 +12,7 @@ var _nodes = require("../ast_utilities/nodes.js");
 class UndefinedRead {
   constructor(memberNode) {
     this.memberNode = memberNode;
+    this.type = "undefinedRead";
   }
 
   fix(ast) {

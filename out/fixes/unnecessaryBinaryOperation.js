@@ -31,6 +31,7 @@ class UnnecessaryBinaryOperation {
     this.rightUnnecessary = rightUnnecessary;
     this.nodeToChange = nodeToChange;
     this.result = result;
+    this.type = "unnecessaryBinaryOperation";
 
     switch (result.type) {
       case _variable.VariableType.NaN:
