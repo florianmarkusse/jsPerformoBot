@@ -4,8 +4,10 @@ var app = require("./out/app.js")
 var fs = require("fs");
 var path = require("path");
 
-var OctoKit = require("@octokit/rest");
-var createPullRequest  = require('octokit-plugin-create-pull-request');
+const OctoKit = require("@octokit/rest");
+const MyOctokit = OctoKit.plugin(
+    require('octokit-plugin-create-pull-request')
+);
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
 var walkSync = function(dir, filelist) {
@@ -35,7 +37,7 @@ async function run() {
 
         //(0, app.gitHubAction)(files);
 
-        const MyOctokit = OctoKit.plugin(createPullRequest);
+        
         const octo = new MyOctokit({
             auth: repoToken,
         });
@@ -46,7 +48,7 @@ async function run() {
         let firstOwner = stringified.substr(0, slash);
         let secondRepo = stringified.substr(slash + 1, stringified.length);
 
-        octokit
+        octo
             .createPullRequest({
                 owner: firstOwner,
                 repo: secondRepo,
