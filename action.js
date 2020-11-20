@@ -103,7 +103,7 @@ async function run() {
                 filesObject[filePath] = results[i+1];
 
                 technicalPart += `In file ${filePath} I found the following issue:\n`
-                switch (results[i + 1]){
+                switch (results[i + 2]){
                     case fixTypes.UNDEFINED_READ:
                         technicalPart += messages[0];
                         break;

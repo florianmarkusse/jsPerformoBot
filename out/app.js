@@ -107,7 +107,7 @@ function doChecking(fileStringsToCheck) {
 
       results.push(fileString);
       results.push(_escodegen.default.generate(ast));
-      results.push(fixToDo.type);
+      results.push(previousFix.type);
     }
   }
 
