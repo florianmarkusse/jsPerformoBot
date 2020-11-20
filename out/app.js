@@ -38,7 +38,6 @@ function doChecking(fileStringsToCheck) {
 
   let filesFixed = [];
   let deepCopyAST;
-  let batchMode = true;
 
   for (let i = 0; i < fileStringsToCheck.length; i++) {
     const fileString = fileStringsToCheck[i];
@@ -107,11 +106,7 @@ function doChecking(fileStringsToCheck) {
       });
       filesFixed.push(fileString);
 
-      if (batchMode) {
-        batchWrite(fileString, data, ast);
-      } else {
-        testWrite(ast);
-      }
+      console.log(_escodegen.generate(ast));
     }
   }
 
