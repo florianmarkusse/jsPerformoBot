@@ -36,7 +36,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function doChecking(fileStringsToCheck) {
 
-  let filesFixed = [];
   let deepCopyAST;
 
   for (let i = 0; i < fileStringsToCheck.length; i++) {
@@ -101,12 +100,9 @@ function doChecking(fileStringsToCheck) {
     );
 
     if (foundFix) {
-      fixesApplied.forEach(fix => {
-        console.log(fix);
-      });
-      filesFixed.push(fileString);
-
-      console.log(_escodegen.generate(ast));
+      console.log(`Found performance bug in: ${fileString}`);
+      console.log(_escodegen.default.generate(ast));
+      console.log();
     }
   }
 
