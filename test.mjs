@@ -1,11 +1,12 @@
-let string =  "refs/heads/main"
 
-let result = string.split("/");
-console.log(result);
+let thing = {};
 
-let newString = "";
-for (let i = 2; i < result.length; i++) {
-    newString += result[i];
-}
+let file1 = "file1";
+let file2 = "file2";
 
-console.log(newString);
+thing[file1] = "dfgf";
+thing[file2] = "kgfgkgfg";
+
+console.log(thing);
+
+

@@ -34,7 +34,7 @@ async function run() {
         let files = walkSync(workingDirectory, []).filter((file) => file.includes(".js") || file.includes(".mjs"));
         console.log(files);
 
-        //(0, app.gitHubAction)(files);
+        let result = (0, app.gitHubAction)(files);
 
         
         const octo = new MyOctokit({
@@ -54,6 +54,8 @@ async function run() {
             baseBranch += split[i];
         }
 
+        let file = "path/to/file1.txt"
+
         octo
             .createPullRequest({
                 owner: firstOwner,
@@ -66,7 +68,7 @@ async function run() {
                 {
                     /* optional: if `files` is not passed, an empty commit is created instead */
                     files: {
-                    "path/to/file1.txt": "Content for file1",
+                        file: "Content for file1",
                     },
                     commit:
                     "new commit",
