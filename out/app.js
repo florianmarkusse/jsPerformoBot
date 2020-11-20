@@ -34,110 +34,89 @@ var _fix = require("./fixes/fix.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let fileStringsToCheck = [];
-let filesFixed = [];
-let deepCopyAST;
-let batchMode = true;
-let inputDirectory;
-let outputDirectory;
-let procVarLength = process.argv.length;
+function doChecking(fileStringsToCheck) {
 
-for (let i = 0; i < procVarLength; i++) {
-  console.log(String(process.argv[i]));
-}
+  let filesFixed = [];
+  let deepCopyAST;
+  let batchMode = true;
 
-if (String(process.argv[2]).endsWith(".js") || String(process.argv[2]).endsWith(".mjs")) {
-  fileStringsToCheck[0] = './test_files/' + String(process.argv[2]);
-  batchMode = false;
-} else {
-  // Batch mode
-  if (process.argv.length != 4) {
-    console.log("Specify input directory and output directory, e.g.: npm run bar C:\\testositories C:\\incorrectFiles");
-    throw Error();
-  } else {
-    inputDirectory = String(process.argv[2]) + "\\";
-    outputDirectory = String(process.argv[3]) + "\\";
-  }
+  for (let i = 0; i < fileStringsToCheck.length; i++) {
+    const fileString = fileStringsToCheck[i];
 
-  let result = getAllFilesRecursively(inputDirectory);
-  fileStringsToCheck = getOnlyJSFiles(result);
-}
-
-for (let i = 0; i < fileStringsToCheck.length; i++) {
-  const fileString = fileStringsToCheck[i];
-
-  if (fileString.includes('.min')) {
-    continue;
-  }
-
-  console.log("Reading file ".concat(fileString));
-
-  let data = _fs.default.readFileSync(fileString, function read(err, data) {
-    if (err) {
-      throw err;
-    }
-  });
-
-  let ast;
-
-  try {
-    ast = _espree.default.parse(data, {
-      tokens: false,
-      ecmaVersion: 11,
-      sourceType: "module"
-    });
-  } catch (err) {
-    continue;
-  }
-
-  deepCopyAST = _lodash.default.cloneDeep(ast);
-  let previousFix;
-  let fixToDo;
-  let foundFix = false;
-  let fixesApplied = [];
-
-  do {
-    // The processing happens here
-    processAST(ast);
-    let iterator = (0, _fix.getFixSet)().values();
-    fixToDo = iterator.next().value;
-
-    while (previousFix !== undefined && fixToDo !== undefined && fixToDo.isEqualTo(previousFix) || (0, _fix.containsInUnfixableSet)(fixToDo)) {
-      (0, _fix.addToUnfixableSet)(fixToDo);
-      fixToDo = iterator.next().value;
+    if (fileString.includes('.min')) {
+      continue;
     }
 
-    if (fixToDo !== undefined) {
-      fixToDo.fix(ast);
+    console.log("Reading file ".concat(fileString));
 
-      if (!_lodash.default.isEqual(ast, deepCopyAST)) {
-        foundFix = true;
-        fixesApplied.push(fixToDo);
+    let data = _fs.default.readFileSync(fileString, function read(err, data) {
+      if (err) {
+        throw err;
       }
+    });
 
-      ast = _espree.default.parse(_escodegen.default.generate(ast), {
+    let ast;
+
+    try {
+      ast = _espree.default.parse(data, {
         tokens: false,
         ecmaVersion: 11,
         sourceType: "module"
       });
-      previousFix = fixToDo;
+    } catch (err) {
+      continue;
     }
-  } while (fixToDo !== undefined
-  /*false*/
-  );
 
-  if (foundFix) {
-    fixesApplied.forEach(fix => {
-      console.log(fix);
-    });
-    filesFixed.push(fileString);
+    deepCopyAST = _lodash.default.cloneDeep(ast);
+    let previousFix;
+    let fixToDo;
+    let foundFix = false;
+    let fixesApplied = [];
 
-    if (batchMode) {
-      batchWrite(fileString, data, ast);
-    } else {
-      testWrite(ast);
+    do {
+      // The processing happens here
+      processAST(ast);
+      let iterator = (0, _fix.getFixSet)().values();
+      fixToDo = iterator.next().value;
+
+      while (previousFix !== undefined && fixToDo !== undefined && fixToDo.isEqualTo(previousFix) || (0, _fix.containsInUnfixableSet)(fixToDo)) {
+        (0, _fix.addToUnfixableSet)(fixToDo);
+        fixToDo = iterator.next().value;
+      }
+
+      if (fixToDo !== undefined) {
+        fixToDo.fix(ast);
+
+        if (!_lodash.default.isEqual(ast, deepCopyAST)) {
+          foundFix = true;
+          fixesApplied.push(fixToDo);
+        }
+
+        ast = _espree.default.parse(_escodegen.default.generate(ast), {
+          tokens: false,
+          ecmaVersion: 11,
+          sourceType: "module"
+        });
+        previousFix = fixToDo;
+      }
+    } while (fixToDo !== undefined
+    /*false*/
+    );
+
+    if (foundFix) {
+      fixesApplied.forEach(fix => {
+        console.log(fix);
+      });
+      filesFixed.push(fileString);
+
+      if (batchMode) {
+        batchWrite(fileString, data, ast);
+      } else {
+        testWrite(ast);
+      }
     }
   }
+
 }
 
 function processAST(ast) {
