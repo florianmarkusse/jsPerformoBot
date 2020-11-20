@@ -231,6 +231,9 @@ function getBaseAST() {
   return deepCopyAST;
 }
 
-function gitHubAction() {
+function gitHubAction(filesToCheck) {
   console.log("hello");
+  console.log(filesToCheck);
 }
+  
+  
