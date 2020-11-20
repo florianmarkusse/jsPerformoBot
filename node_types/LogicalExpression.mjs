@@ -9,7 +9,7 @@ import { addToFixSet } from "../fixes/fix.mjs";
 import { UnnecessaryBinaryOperation } from "../fixes/unnecessaryBinaryOperation.mjs";
 import { getParent } from "../ast_utilities/astTraversal.mjs";
 
-const { getBaseAST } = require("../app.mjs");
+import { getBaseAST } from "../app.mjs";
 
 
 export function solveLogicalExpressionChain(baseNode) {
