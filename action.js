@@ -8,9 +8,9 @@ const Octokit = require("@octokit/core");
 const { createPullRequest } = require("octokit-plugin-create-pull-request");
 const MyOctokit = Octokit.Octokit.plugin(createPullRequest);
 
-let greetings = "Hello,\n"
-let goodBye = "Kind regards,\njsPerformoBot";
-let disclaimer = "NB: this bot also generates false positives at time, please review the pull request.\n"
+let greetings = "Hello,\n\n"
+let goodBye = "Kind regards,\nFlorian Markusse, author of jsPerformoBot";
+let disclaimer = "NB: this bot also generates false positives at time, please review the pull request.\n\n"
 
 const fixTypes = {
     UNDEFINED_READ: "undefinedRead",
@@ -20,11 +20,11 @@ const fixTypes = {
 
 const messages = [
     // Undefined read
-    "A variable that is *undefined* was read from. Propose to change the assignment to *undefined* if intended behaviour.\n",
+    "A variable that is *undefined* was read from. Propose to change the assignment to *undefined* if intended behaviour.\n\n",
     // Reverse array write
-    "An array is written to in reverse order. This cause a degradation in performance, thus I propose to change the order the array is written to.\n",
+    "An array is written to in reverse order. This cause a degradation in performance, thus I propose to change the order the array is written to.\n\n",
     // Unnecessary binary operation.
-    "A binary operation is performed where the results is already known or partially known. Propose to remove this binary operation.\n",
+    "A binary operation is performed where the results is already known or partially known. Propose to remove this binary operation.\n\n",
 ];
 
 
@@ -102,7 +102,7 @@ async function run() {
 
                 filesObject[filePath] = results[i+1];
 
-                technicalPart += `In file ${filePath} I found the following issue:\n`
+                technicalPart += `In file *${filePath}* I found the following issue:\n`
                 switch (results[i + 2]){
                     case fixTypes.UNDEFINED_READ:
                         technicalPart += messages[0];
