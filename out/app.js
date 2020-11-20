@@ -216,7 +216,7 @@ function getBaseAST() {
 }
 
 function gitHubAction(filesToCheck) {
-  doChecking(filesToCheck);
+  return doChecking(filesToCheck);
 }
   
   
