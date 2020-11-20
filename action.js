@@ -36,12 +36,21 @@ async function run() {
         //(0, app.gitHubAction)(files);
 
         const Octo = new Octokit({auth: repoToken});
+        console.log(process.env.GITHUB_REPOSITORY);
 
-        await Octo.request('POST /repos/{ownerRepo}/git/refs', {
+        let result = await octokit.request('GET /repos/{owner}/{repo}', {
+            owner: 'octocat',
+            repo: 'hello-world'
+          })
+
+        console.log(result);
+
+        let result2 = await Octo.request('POST /repos/{ownerRepo}/git/refs', {
             ownerRepo: process.env.GITHUB_REPOSITORY,
             ref: 'refs/heads/blabla',
             sha: 'e6e68bd5fc0dca570de4648ac473c22041d6acfd'
           })
+        console.log(result2);
     }
     catch (error) {
         core.setFailed(error.message);
