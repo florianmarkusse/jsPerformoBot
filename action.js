@@ -4,7 +4,7 @@ var app = require("./out/app.js")
 var fs = require("fs");
 var path = require("path");
 
-var OctoKit = require("@octokit/core");
+var OctoKit = require("@octokit/rest");
 var createPullRequest  = require('octokit-plugin-create-pull-request');
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
