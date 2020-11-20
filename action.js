@@ -30,7 +30,7 @@ async function run() {
         let files = walkSync(workingDirectory, []).filter((file) => file.includes(".js") || file.includes(".mjs"));
         console.log(files);
 
-        (0, app.gitHubAction)();
+        (0, app.gitHubAction)(files);
     }
     catch (error) {
         core.setFailed(error.message);

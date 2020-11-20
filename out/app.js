@@ -47,8 +47,6 @@ function doChecking(fileStringsToCheck) {
       continue;
     }
 
-    console.log("Reading file ".concat(fileString));
-
     let data = _fs.default.readFileSync(fileString, function read(err, data) {
       if (err) {
         throw err;
@@ -178,16 +176,6 @@ function flatten(input) {
   return res.reverse();
 }
 
-function getOnlyJSFiles(files) {
-  let jsFiles = [];
-  files.forEach(file => {
-    if (file.endsWith(".js") || file.endsWith(".mjs")) {
-      jsFiles.push(file);
-    }
-  });
-  return jsFiles;
-}
-
 function batchWrite(fileString, data, ast) {
   let split = fileString.replace(inputDirectory, '').split("\\");
   let pathBuilder = outputDirectory;
@@ -232,8 +220,7 @@ function getBaseAST() {
 }
 
 function gitHubAction(filesToCheck) {
-  console.log("hello");
-  console.log(filesToCheck);
+  doChecking(filesToCheck);
 }
   
   
