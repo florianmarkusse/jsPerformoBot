@@ -61,7 +61,7 @@ async function run() {
                 title: "pull request title",
                 body: "pull request description",
                 base: baseBranch /* optional: defaults to default branch */,
-                head: `jsPerformoBot-PR-${baseBranch}-${new Date()}`,
+                head: `jsPerformoBot-PR-${baseBranch}-${Date.now()}`,
                 changes: [
                 {
                     /* optional: if `files` is not passed, an empty commit is created instead */
