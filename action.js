@@ -4,7 +4,7 @@ var app = require("./out/app.js")
 var fs = require("fs");
 var path = require("path");
 
-const OctoKit = require("@octokit/rest");
+const { OctoKit } = require("@octokit/rest");
 const MyOctokit = OctoKit.plugin(
     require('octokit-plugin-create-pull-request')
 );
