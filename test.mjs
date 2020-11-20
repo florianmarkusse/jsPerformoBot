@@ -1,11 +1,7 @@
-
-let thing = {};
-
-let file1 = "file1";
-let file2 = "file2";
-
-thing[file1] = "dfgf";
-thing[file2] = "kgfgkgfg";
+let vari = "pat";
+let thing = {
+};
+thing[vari] = "value"
 
 console.log(thing);
 

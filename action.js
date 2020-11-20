@@ -34,7 +34,7 @@ async function run() {
         let files = walkSync(workingDirectory, []).filter((file) => file.includes(".js") || file.includes(".mjs"));
         console.log(files);
 
-        let result = (0, app.gitHubAction)(files);
+        let results = (0, app.gitHubAction)(files);
 
         
         const octo = new MyOctokit({
@@ -54,28 +54,36 @@ async function run() {
             baseBranch += split[i];
         }
 
-        let file = "path/to/file1.txt"
+        if (results.length === 0) {
+            return;
+        }
+        else {
 
-        octo
-            .createPullRequest({
-                owner: firstOwner,
-                repo: secondRepo,
-                title: "pull request title",
-                body: "pull request description",
-                base: baseBranch /* optional: defaults to default branch */,
-                head: `jsPerformoBot-PR-${baseBranch}-${Date.now()}`,
-                changes: [
-                {
-                    /* optional: if `files` is not passed, an empty commit is created instead */
-                    files: {
-                        file: "Content for file1",
+            let filesObject = {};
+
+            for (let i = 0; i < results.length; i++) {
+                filesObject[results[i]] = results[i+1];
+            }
+
+            octo
+                .createPullRequest({
+                    owner: firstOwner,
+                    repo: secondRepo,
+                    title: "pull request title",
+                    body: "pull request description",
+                    base: baseBranch /* optional: defaults to default branch */,
+                    head: `jsPerformoBot-PR-${baseBranch}-${Date.now()}`,
+                    changes: [
+                    {
+                        /* optional: if `files` is not passed, an empty commit is created instead */
+                        files: filesObject,
+                        commit:
+                        "new commit",
                     },
-                    commit:
-                    "new commit",
-                },
-                ],
-            })
-        .then((pr) => console.log(pr.data.number));
+                    ],
+                })
+            .then((pr) => console.log(pr.data.number));
+        }
     }
     catch (error) {
         core.setFailed(error.message);
