@@ -1,4 +1,4 @@
-name: 'jePerformoBot'
+name: 'jsPerformoBot'
 author: 'Florian Markusse'
 description: 'Uses jsPerformoBot to check for performance improvements.'
 inputs:
