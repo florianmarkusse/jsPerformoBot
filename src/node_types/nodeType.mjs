@@ -29,8 +29,6 @@ import { handleCallExpression } from './callExpression.mjs';
 import { solveConditionalExpression } from './conditionalExpression.mjs';
 import { VariableType } from '../types/variable.mjs';
 import { handleArrayPattern } from './arrayPattern.mjs';
-
-import { TimeOutError } from '../error/timeoutError.mjs';
 import { handleForInStatement } from './forInStatement.mjs';
 
 export const NodeType = Object.freeze({

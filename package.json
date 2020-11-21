@@ -32,7 +32,7 @@
     "test": "node app.mjs test.mjs",
     "bla": "node app.mjs bla.mjs",
     "debug": "node debug.js test.mjs",
-    "batch": "node app.mjs",
+    "batch": "node src/app.mjs",
     "bar": "node app.mjs"
   },
   "author": "",
