@@ -1,9 +1,5 @@
 # jsPerformoBot
 
-Repository for the performance bot in JavaScript.
+Repository for the static-analysis performance bot in JavaScript.
 
-Link to logbook:
-https://www.overleaf.com/read/czvjqkbttzry
-
-Link to Report (only structure is present at the moment):
-https://www.overleaf.com/read/gcmnhfdqxkfg
+For more information please visit *jsPerformoBotData* repository: https://github.com/florianmarkusse/jsPerformoBotData

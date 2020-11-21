@@ -10,6 +10,6 @@ runs:
   using: 'node12'
   main: 'action.js'
   
- branding:
-  icon: 'check-square'
-  color: 'dark-gray'
+branding:
+  icon: 'check-circle'
+  color: 'blue'
