@@ -9,3 +9,7 @@ inputs:
 runs:
   using: 'node12'
   main: 'action.js'
+  
+ branding:
+  icon: 'check-square'
+  color: 'dark-gray'
