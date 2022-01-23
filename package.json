@@ -10,7 +10,6 @@
     "@octokit/core": "^3.2.1",
     "@octokit/graphql": "^4.5.7",
     "@octokit/rest": "^18.0.9",
-    "core-js": "^3.7.0",
     "escodegen": "^2.0.0",
     "espree": "^7.3.0",
     "estree-walker": "^2.0.1",
@@ -30,7 +29,7 @@
     "reverse": "node app.mjs reverseArrayWrite.js",
     "undefinedRead": "node app.mjs undefinedRead.js",
     "test": "node app.mjs test.mjs",
-    "bla": "node app.mjs bla.mjs",
+    "bla": "node src/app.mjs unnecessaryBinaryOperation.js",
     "debug": "node debug.js test.mjs",
     "batch": "node src/app.mjs",
     "bar": "node app.mjs"

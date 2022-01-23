@@ -24,7 +24,7 @@ for (let i = 0; i < procVarLength; i++) {
     console.log(String(process.argv[i]));
 }
 
-if (String(process.argv[2]).endsWith(".js") || String(process.argv[2]).endsWith(".mjs")) { 
+if (String(process.argv[2]).endsWith(".js") || String(process.argv[2]).endsWith(".mjs")) {
     fileStringsToCheck[0] = './test_files/' + String(process.argv[2]);
     batchMode = false;
 } else {
@@ -55,64 +55,64 @@ for (let i = 0; i < fileStringsToCheck.length; i++) {
             throw err;
         }
     });
-    
+
 
     let ast;
     try {
-        ast = espree.parse(data, { tokens: false, ecmaVersion: 11 , sourceType: "module"});
-    } catch(err) {
+        ast = espree.parse(data, { tokens: false, ecmaVersion: 11, sourceType: "module" });
+    } catch (err) {
         continue;
     }
     deepCopyAST = lodash.cloneDeep(ast);
-    
+
     let previousFix;
     let fixToDo;
     let foundFix = false;
     let fixesApplied = [];
-        do {
-            // The processing happens here
-            processAST(ast);
+    do {
+        // The processing happens here
+        processAST(ast);
 
-            let iterator = getFixSet().values();
+        let iterator = getFixSet().values();
+        fixToDo = iterator.next().value;
+
+        while ((previousFix !== undefined && fixToDo !== undefined && fixToDo.isEqualTo(previousFix)) || containsInUnfixableSet(fixToDo)) {
+            addToUnfixableSet(fixToDo);
             fixToDo = iterator.next().value;
-    
-            while ((previousFix !== undefined && fixToDo !== undefined && fixToDo.isEqualTo(previousFix)) || containsInUnfixableSet(fixToDo)) {
-                addToUnfixableSet(fixToDo);
-                fixToDo = iterator.next().value;
-            } 
-    
-    
-            if (fixToDo !== undefined) {
-                fixToDo.fix(ast);
-                if (!lodash.isEqual(ast, deepCopyAST)) {
-                    foundFix = true;
-                    fixesApplied.push(fixToDo);
-                }
-                ast = espree.parse(escodegen.generate(ast), { tokens: false, ecmaVersion: 11 , sourceType: "module"});
-                previousFix = fixToDo;
-            }
-        } while(fixToDo !== undefined/*false*/);
-    
-        if (foundFix) {
-            fixesApplied.forEach(fix => {
-                console.log(fix);
-            });
-            filesFixed.push(fileString);
-
-            if (batchMode) {
-                batchWrite(fileString, data, ast);
-            } else {
-                testWrite(ast);
-            }
-
         }
+
+
+        if (fixToDo !== undefined) {
+            fixToDo.fix(ast);
+            if (!lodash.isEqual(ast, deepCopyAST)) {
+                foundFix = true;
+                fixesApplied.push(fixToDo);
+            }
+            ast = espree.parse(escodegen.generate(ast), { tokens: false, ecmaVersion: 11, sourceType: "module" });
+            previousFix = fixToDo;
+        }
+    } while (fixToDo !== undefined/*false*/);
+
+    if (foundFix) {
+        fixesApplied.forEach(fix => {
+            console.log(fix);
+        });
+        filesFixed.push(fileString);
+
+        if (batchMode) {
+            batchWrite(fileString, data, ast);
+        } else {
+            testWrite(ast);
+        }
+
+    }
 }
 
 function processAST(ast) {
 
     clearGlobals();
     processASTNode(ast);
-        
+
     /*
     getVariables()[0].forEach(element => {
         console.log(element);
@@ -124,8 +124,8 @@ function processAST(ast) {
         console.log(fix.nodeToChange);
     })
     */
-    
-    
+
+
     return ast;
 }
 
@@ -154,19 +154,19 @@ function getAllFilesRecursively(fileName) {
 function flatten(input) {
     const stack = [...input];
     const res = [];
-    while(stack.length) {
-      // pop value from stack
-      const next = stack.pop();
-      if(Array.isArray(next)) {
-        // push back array items, won't modify the original input
-        stack.push(...next);
-      } else {
-        res.push(next);
-      }
+    while (stack.length) {
+        // pop value from stack
+        const next = stack.pop();
+        if (Array.isArray(next)) {
+            // push back array items, won't modify the original input
+            stack.push(...next);
+        } else {
+            res.push(next);
+        }
     }
     // reverse to restore input order
     return res.reverse();
-  }
+}
 
 function getOnlyJSFiles(files) {
     let jsFiles = [];
@@ -175,8 +175,8 @@ function getOnlyJSFiles(files) {
         if (file.endsWith(".js") || file.endsWith(".mjs")) {
             jsFiles.push(file);
         }
-    })    
-    
+    })
+
     return jsFiles;
 }
 
@@ -202,13 +202,13 @@ function batchWrite(fileString, data, ast) {
 
     fs.writeFileSync(pathBuilder, data, (err) => {
         if (err) {
-            console.log(err); 
+            console.log(err);
         }
     });
 
     fs.writeFileSync(fixedPath, escodegen.generate(ast), (err) => {
         if (err) {
-            console.log(err); 
+            console.log(err);
         }
     });
 }
@@ -216,7 +216,7 @@ function batchWrite(fileString, data, ast) {
 function testWrite(ast) {
     fs.writeFileSync(".\\results\\test_fixed.mjs", escodegen.generate(ast), (err) => {
         if (err) {
-            console.log(err); 
+            console.log(err);
         }
     });
 }
